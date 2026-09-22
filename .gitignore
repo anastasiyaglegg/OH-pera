@@ -36,3 +36,8 @@ next-env.d.ts
 /.wrangler/
 /outputs/
 /work/
+
+# Local importer database
+.data/
+.sites-runtime/
+*.tsbuildinfo

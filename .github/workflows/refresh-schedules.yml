@@ -1,0 +1,37 @@
+name: Refresh NYC opera schedules
+on:
+  schedule:
+    - cron: '17 */6 * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: opera-schedule-refresh
+  cancel-in-progress: false
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run test:data
+      - name: Fetch sources and retain previously verified data on failures
+        run: npm run data:refresh
+      - name: Save schedule snapshot
+        if: always()
+        run: |
+          if [ ! -f data/schedule.json ]; then exit 1; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/schedule.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'Refresh NYC opera schedule snapshot'
+            git push origin HEAD:main
+          fi
