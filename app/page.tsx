@@ -1,8 +1,7 @@
 'use client';
-
-import { useEffect, useMemo, useState } from 'react';
-
-import { formatTime, isStale, nycDate, type Performance, type Schedule } from '../lib/schedule';
+import {useCallback,useEffect,useMemo,useRef,useState} from 'react';
+import {formatTime,isStale,nycDate,type Performance,type Schedule} from '../lib/schedule';
+import {defaultFilters,displayTitle,filterEvents,groupProductions,normalize,productionKey,type Filters,type Production} from '../lib/discovery';
 const operaArtwork:Record<string,string> = {
  'macbeth':'macbeth','cosi fan tutte':'cosi-fan-tutte','la boheme':'la-boheme',
  'lincoln in the bardo':'lincoln-in-the-bardo','medea':'medea','samson et dalila':'samson-et-dalila',
@@ -21,104 +20,63 @@ function Artwork({item,large=false}:{item:Performance;large?:boolean}){
   </div>;
 }
 
-export default function Home(){
-  const [view,setView]=useState<'discover'|'favorites'|'about'>('discover');
-  const [filter,setFilter]=useState('All performances');
-  const [company,setCompany]=useState('All companies');
-  const [selected,setSelected]=useState<Performance|null>(null);
-  const [favorites,setFavorites]=useState<string[]>([]);
-  const [askOpen,setAskOpen]=useState(false);
-  const [schedule,setSchedule]=useState<Schedule|null>(null);
-  const [feedError,setFeedError]=useState(false);
-  const [today,setToday]=useState(nycDate());
-  const [favoritesLoaded,setFavoritesLoaded]=useState(false);
-  const [kind,setKind]=useState('all');
-  const performances=schedule?.performances ?? [];
-
-  useEffect(()=>{
-    const controller=new AbortController();
-    const refresh=async()=>{try{
-      const response=await fetch('/api/performances',{signal:controller.signal});
-      if(!response.ok)throw new Error('Schedule unavailable');
-      const data:Schedule=await response.json();
-      if(!Array.isArray(data.performances)||!Array.isArray(data.sources))throw new Error('Invalid schedule');
-      setSchedule(data);setFeedError(false);setToday(nycDate());
-    }catch{if(!controller.signal.aborted)setFeedError(true);}};
-    void refresh();const interval=setInterval(refresh,5*60*1000);
-    return()=>{controller.abort();clearInterval(interval);};
-  },[]);
-
-  useEffect(()=>{ try{ const stored=JSON.parse(localStorage.getItem('ohpera-favorites')||'[]');if(Array.isArray(stored))setFavorites(stored.filter(x=>typeof x==='string')); }catch{} setFavoritesLoaded(true); },[]);
-  useEffect(()=>{ if(favoritesLoaded){try{localStorage.setItem('ohpera-favorites',JSON.stringify(favorites));}catch{}} },[favorites,favoritesLoaded]);
-  useEffect(()=>{ document.body.style.overflow=selected||askOpen?'hidden':''; return()=>{document.body.style.overflow='';}; },[selected,askOpen]);
-
-  const visible=useMemo(()=>performances.filter((p)=>{
-    const days=(Date.parse(p.date+'T12:00:00Z')-Date.parse(today+'T12:00:00Z'))/86400000;
-    if(p.date<today)return false;
-    if(kind!=='all'&&p.kind!==kind)return false;
-    if(view==='favorites'&&!favorites.includes(p.id)) return false;
-    if(filter==='This week'&&(days<0||days>=7)) return false;
-    if(filter==='This month'&&(p.date.slice(0,7)!==today.slice(0,7))) return false;
-    if(company!=='All companies'&&p.company!==company) return false;
-    return true;
-  }),[filter,company,view,favorites,schedule,today,kind]);
-
-  const toggleFavorite=(id:string)=>setFavorites((current)=>current.includes(id)?current.filter((x)=>x!==id):[...current,id]);
-  const navigate=(next:typeof view)=>{setView(next);setFilter('All performances');setCompany('All companies');setKind('all');window.scrollTo({top:0,behavior:'smooth'});};
-
-  return <main>
-    <header className="site-header">
-      <button className="wordmark" onClick={()=>navigate('discover')} aria-label="OH-pera home">OH<span>—</span>pera!</button>
-      <nav aria-label="Primary navigation">
-        <button className={view==='discover'?'active':''} onClick={()=>navigate('discover')}>Discover</button>
-        <button className={view==='favorites'?'active':''} onClick={()=>navigate('favorites')}>My Operas <span className="count">{favorites.length}</span></button>
-        <button className={view==='about'?'active':''} onClick={()=>navigate('about')}>About</button>
-      </nav>
-      <button className="ask-button" onClick={()=>setAskOpen(true)}>Ask OH-pera! <span>↗</span></button>
-    </header>
-
-    {view==='about'?<About onDiscover={()=>navigate('discover')}/>:<>
-      <section className={`hero ${view==='favorites'?'favorites-hero':'illustrated-hero'}`}>
-        <p className="eyebrow">{view==='favorites'?'Your personal shortlist':'New York City · Upcoming opera'}</p>
-        <h1>{view==='favorites'?<>The operas you<br />don’t want to miss.</>:<>What opera can<br />I see in NYC?</>}</h1>
-        <p className="intro">{view==='favorites'?'Save performances that catch your eye, then find them together here.':<>Discover upcoming opera across New York, with official sources and clear information about when schedules were checked.</>}</p>
-      </section>
-      <section className="discover" aria-labelledby="upcoming-title">
-        <div className="section-head"><div><p className="section-kicker">{view==='favorites'?'Saved for later':'On stage soon'}</p><h2 id="upcoming-title">{view==='favorites'?'My Operas':'Upcoming performances'}</h2></div><p className="result-count">{visible.length} {visible.length===1?'performance':'performances'}</p></div>
-        <p className="schedule-summary" role="status">{!schedule?(feedError?'Schedules could not be loaded. Please try again shortly.':'Checking schedules…'):`${schedule.sources.length} organizations monitored · Times in New York local time · Some sources have incomplete dates.`}</p>
-        {schedule?.delivery==='bundled'&&<p className="feed-notice">Showing the saved schedule snapshot. The latest automatic feed is not available yet.</p>}
-        {feedError&&schedule&&<p className="feed-notice" role="status">Refresh unavailable. Previously loaded listings remain visible.</p>}
-        <details className="coverage"><summary>Sources &amp; coverage {schedule&&`· ${schedule.sources.filter(s=>s.status!=='live'||isStale(s.lastSuccessAt)).length} need attention`}</summary>
-          <p>Coverage currently includes five organizations, not every NYC opera company. Announcements without exact dates appear separately below.</p>
-          <div className="source-grid">{schedule?.sources.map(s=><article key={s.id}>
-            <a href={s.url} target="_blank" rel="noreferrer">{s.name} ↗</a>
-            <strong>{s.status==='error'?'Source unavailable':s.status==='fallback'?'Secondary snapshot':s.status==='partial'?'Partial coverage':'Connected'}{isStale(s.lastSuccessAt)?' · Out of date':''}</strong>
-            <p>{s.message}</p><small>{s.lastSuccessAt?`Data verified ${new Date(s.lastSuccessAt).toLocaleString('en-US',{timeZone:'America/New_York'})} ET`:'Not yet verified'}</small>
-          </article>)}</div>
-        </details>
-        <div className="filters" aria-label="Performance filters">
-          {['All performances','This week','This month'].map((item)=><button key={item} className={filter===item?'selected':''} onClick={()=>setFilter(item)}>{item}</button>)}
-          <label className="company-filter"><span className="sr-only">Filter by company</span><select value={company} onChange={(e)=>setCompany(e.target.value)}>{companyOptions.map((item)=><option key={item}>{item}</option>)}</select><i>⌄</i></label>
-          <label className="company-filter"><span className="sr-only">Performance type</span><select value={kind} onChange={e=>setKind(e.target.value)}><option value="all">All event types</option><option value="opera">Staged opera</option><option value="concert">Opera concerts</option><option value="screening">HD screenings</option></select><i>⌄</i></label>
-        </div>
-        {!schedule?<p className="loading-feed">{feedError?'The schedule feed is unavailable. Reload to retry.':'Loading verified listings…'}</p>:visible.length?<div className="performance-grid">{visible.map((p)=><article className="performance-card" key={p.id} onClick={()=>setSelected(p)} tabIndex={0} onKeyDown={(e)=>{if(e.key==='Enter')setSelected(p)}}>
-          <div className="art-wrap"><Artwork item={p}/><button className={`save ${favorites.includes(p.id)?'saved':''}`} onClick={(e)=>{e.stopPropagation();toggleFavorite(p.id)}} aria-label={`${favorites.includes(p.id)?'Remove':'Save'} ${p.title}`}>{favorites.includes(p.id)?'♥':'♡'}</button></div>
-          <div className="card-body"><div className="date-block"><strong>{new Date(`${p.date}T12:00:00`).getDate().toString().padStart(2,'0')}</strong><span>{new Date(`${p.date}T12:00:00`).toLocaleString('en-US',{month:'short'}).toUpperCase()}</span></div><div className="card-copy"><p className="company">{p.company}</p><h3>{p.title}</h3><p className="composer">{p.composer}</p><p className="location">{formatTime(p.time)} <span>·</span> {[p.neighborhood,p.borough].filter(Boolean).join(' · ')}</p><p className={`verification-note ${isStale(p.checkedAt)||p.status!=='scheduled'?'needs-check':''}`}>{p.status==='cancelled'?'Cancelled':p.status==='unconfirmed'?'Date needs reconfirmation':isStale(p.checkedAt)?'Older schedule — confirm with venue':p.kind==='screening'?'Cinema screening':'Source verified'}{p.verification==='secondary'?' · Secondary source':''}</p></div><span className="arrow">↗</span></div>
-        </article>)}</div>:<div className="empty"><span>♪</span><h3>No operas here yet.</h3><p>{view==='favorites'?'Tap the heart on a performance to build your shortlist.':'Try another date or company filter.'}</p><button onClick={()=>{setFilter('All performances');setCompany('All companies');setKind('all');if(view==='favorites')navigate('discover')}}>Browse all performances</button></div>}
-        {view==='discover'&&!!schedule?.announcements.length&&<section className="announcements"><h2>Season announcements</h2><p>These are production announcements, not confirmed individual performance sessions.</p><div>{schedule.announcements.filter(a=>company==='All companies'||a.company===company).map(a=><article key={a.id}><p className="company">{a.company}</p><h3><a href={a.sourceUrl} target="_blank" rel="noreferrer">{a.title} ↗</a></h3><p>{a.dateText}</p><small>{a.note}</small></article>)}</div></section>}
-      </section>
-    </>}
-
-    <footer><div className="wordmark">OH<span>—</span>pera!</div><p>Opera across New York City, all in one place.</p><p className="footer-note">Source-linked schedules · Confirm availability with the presenter before booking. Artwork is AI-generated and inspired by each opera; it does not depict actual productions.</p></footer>
-
-    {selected&&<div className="modal-backdrop" onMouseDown={(e)=>{if(e.currentTarget===e.target)setSelected(null)}}><section className="detail-modal" role="dialog" aria-modal="true" aria-labelledby="detail-title">
-      <button className="close" onClick={()=>setSelected(null)} aria-label="Close details">×</button>
-      <div className="detail-art"><Artwork item={selected} large/><button className={`detail-save ${favorites.includes(selected.id)?'saved':''}`} onClick={()=>toggleFavorite(selected.id)}>{favorites.includes(selected.id)?'♥ Saved':'♡ Save to My Operas'}</button></div>
-      <div className="detail-copy"><p className="eyebrow">{selected.company}</p><h2 id="detail-title">{selected.title}</h2><p className="detail-composer">{selected.composer?`Music by ${selected.composer}`:''}</p><div className="detail-facts"><div><span>When</span><strong>{formatDate(selected.date,true)}<br/>{formatTime(selected.time)}</strong></div><div><span>Where</span><strong>{selected.venue||'Venue to be confirmed'}<br/>{[selected.neighborhood,selected.borough].filter(Boolean).join(', ')}</strong></div><div><span>Experience</span><strong>{selected.runtime||'Running time not confirmed'}<br/>{selected.language||'Language not confirmed'}</strong></div></div><p className="synopsis">{selected.description}</p><p className="verification-note">{selected.status==='cancelled'?'This performance is cancelled. ':selected.status==='unconfirmed'?'This date needs reconfirmation. ':''}Source verified {new Date(selected.checkedAt).toLocaleDateString('en-US',{timeZone:'America/New_York'})}.{selected.verification==='secondary'?' From a secondary schedule snapshot.':''} {isStale(selected.checkedAt)?'This information is older than 24 hours; check the official page.':''}</p><div className="detail-actions">{selected.status!=='cancelled'&&<a className="ticket-button" href={selected.ticketUrl||selected.sourceUrl} target="_blank" rel="noreferrer">Check dates &amp; tickets <span>↗</span></a>}<a href={selected.sourceUrl} target="_blank" rel="noreferrer" className="source-link">Official production page</a></div></div>
-    </section></div>}
-
-    {askOpen&&<div className="modal-backdrop" onMouseDown={(e)=>{if(e.currentTarget===e.target)setAskOpen(false)}}><section className="ask-modal" role="dialog" aria-modal="true" aria-labelledby="ask-title"><button className="close" onClick={()=>setAskOpen(false)} aria-label="Close">×</button><p className="eyebrow">Coming in a future act</p><h2 id="ask-title">Ask OH-pera!</h2><p>Soon, you’ll be able to ask things like “What should I see this weekend?” or “Which opera is best for a first-timer?”</p><div className="fake-input"><span>Which opera should I see this weekend?</span><button disabled>Ask ↗</button></div><small>The discovery experience comes first. AI recommendations are not part of this MVP.</small></section></div>}
-  </main>;
+const kindName=(kind:string)=>kind==='screening'?'Cinema screening':kind==='concert'?'Opera concert':'Staged opera';
+const dateNames:Record<string,string>={any:'Any date',week:'Next 7 days',weekend:'This weekend',month:'This month',date:'Choose a date'};
+type View='discover'|'favorites'|'announcements'|'about';
+function readLocation(){const p=new URLSearchParams(window.location.search);const f={...defaultFilters};for(const k of Object.keys(f) as (keyof Filters)[])f[k]=p.get(k)||f[k];if(!dateNames[f.range])f.range='any';if(!['all','opera','concert','screening'].includes(f.kind))f.kind='all';return {f,view:(['discover','favorites','announcements','about'].includes(p.get('view')||'')?p.get('view'):'discover') as View,layout:p.get('layout')==='dates'?'dates':'productions',event:p.get('event')||''};}
+function Freshness({item}:{item:Performance}){return <p className={`verification-note ${isStale(item.checkedAt)||item.status!=='scheduled'?'needs-check':''}`}>{item.status==='cancelled'?'Cancelled':item.status==='unconfirmed'?'Needs reconfirmation':isStale(item.checkedAt)?'Older listing — confirm with presenter':'Source checked'}{item.verification==='secondary'?' · Secondary source':''}</p>;}
+function ProductionDialog({item,sessions,onClose,onSelect,saved,onSave}:{item:Performance;sessions:Performance[];onClose:()=>void;onSelect:(id:string)=>void;saved:boolean;onSave:()=>void}){
+ const ref=useRef<HTMLDialogElement>(null);const closeRef=useRef(onClose);closeRef.current=onClose;
+ useEffect(()=>{const dialog=ref.current!;const opener=document.activeElement as HTMLElement|null;const overflow=document.body.style.overflow;dialog.showModal();document.body.style.overflow='hidden';return()=>{dialog.close();document.body.style.overflow=overflow;if(opener?.isConnected)opener.focus();else document.getElementById('results-heading')?.focus();};},[]);
+ const title=displayTitle(item);
+ return <dialog ref={ref} className="production-dialog" aria-labelledby="detail-title" onCancel={e=>{e.preventDefault();closeRef.current();}} onClick={e=>{if(e.target===e.currentTarget){const r=e.currentTarget.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)onClose();}}}>
+ <button className="close" autoFocus onClick={onClose} aria-label="Close performance details">×</button>
+ <div className="dialog-layout"><div className="dialog-art"><Artwork item={item} large/></div><div className="dialog-copy">
+ <p className="eyebrow">{item.company}</p><span className="event-kind">{kindName(item.kind)}</span><h2 id="detail-title">{title.title}</h2>{title.composer&&<p className="detail-composer">{title.composer}</p>}
+ <label className="field">All production dates<select value={item.id} onChange={e=>onSelect(e.target.value)}>{sessions.map(p=><option key={p.id} value={p.id}>{formatDate(p.date,true)} · {formatTime(p.time)}{p.status!=='scheduled'?` · ${p.status}`:''}</option>)}</select></label>
+ <dl className="production-facts"><div><dt>Venue</dt><dd>{item.venue||'Venue to be confirmed'}<br/>{[item.neighborhood,item.borough].filter(Boolean).join(', ')}</dd></div>{item.runtime&&<div><dt>Running time</dt><dd>{item.runtime}</dd></div>}{item.language&&<div><dt>Language</dt><dd>{item.language}</dd></div>}</dl>
+ {item.description&&<p className="synopsis">{item.description}</p>}<Freshness item={item}/><p className="check-date">Checked {new Date(item.checkedAt).toLocaleDateString('en-US',{timeZone:'America/New_York'})}. Confirm details with the presenter.</p>
+ <div className="detail-actions">{item.status!=='cancelled'&&<a className="ticket-button" href={item.ticketUrl||item.sourceUrl} target="_blank" rel="noreferrer">Check tickets ↗</a>}<button className="outline-button" aria-pressed={saved} onClick={onSave}>{saved?'♥ Saved date':'♡ Save this date'}</button><a href={item.sourceUrl} target="_blank" rel="noreferrer" className="source-link">Official source ↗</a></div>
+ <p className="check-date">This performance has a shareable URL in your address bar.</p></div></div></dialog>;
 }
-
+export default function Home(){
+ const [schedule,setSchedule]=useState<Schedule|null>(null),[error,setError]=useState(false),[today,setToday]=useState(nycDate());
+ const [view,setView]=useState<View>('discover'),[f,setF]=useState<Filters>(defaultFilters),[layout,setLayout]=useState('productions'),[eventId,setEventId]=useState(''),[ready,setReady]=useState(false);
+ const [favorites,setFavorites]=useState<string[]>([]),[savedRecords,setSavedRecords]=useState<Record<string,Performance>>({}),[archive,setArchive]=useState(false),[refresh,setRefresh]=useState(0);
+ useEffect(()=>{const sync=()=>{const state=readLocation();setF(state.f);setView(state.view);setLayout(state.layout);setEventId(state.event);};sync();try{const ids=JSON.parse(localStorage.getItem('ohpera-favorites')||'[]');if(Array.isArray(ids))setFavorites(ids.filter(x=>typeof x==='string'));const records=JSON.parse(localStorage.getItem('ohpera-saved-records')||'{}');if(records&&typeof records==='object'&&!Array.isArray(records))setSavedRecords(records);}catch{}setReady(true);window.addEventListener('popstate',sync);return()=>window.removeEventListener('popstate',sync);},[]);
+ useEffect(()=>{if(!ready)return;const params=new URLSearchParams();if(view!=='discover')params.set('view',view);for(const k of Object.keys(f) as (keyof Filters)[])if(f[k]!==defaultFilters[k]&&f[k])params.set(k,f[k]);if(layout==='dates')params.set('layout',layout);if(eventId)params.set('event',eventId);const query=params.toString();window.history.replaceState(window.history.state,'',window.location.pathname+(query?'?'+query:''));},[f,view,layout,eventId,ready]);
+ useEffect(()=>{const controller=new AbortController();const load=async()=>{try{const res=await fetch('/api/performances',{signal:controller.signal});if(!res.ok)throw Error();const data:Schedule=await res.json();if(!Array.isArray(data.performances)||!Array.isArray(data.sources)||!Array.isArray(data.announcements))throw Error();setSchedule(data);setError(false);setToday(nycDate());}catch{if(!controller.signal.aborted)setError(true);}};void load();const timer=setInterval(load,300000);return()=>{controller.abort();clearInterval(timer);};},[refresh]);
+ useEffect(()=>{if(!ready)return;try{localStorage.setItem('ohpera-favorites',JSON.stringify(favorites));localStorage.setItem('ohpera-saved-records',JSON.stringify(savedRecords));}catch{}},[favorites,savedRecords,ready]);
+ useEffect(()=>{if(!schedule||!favorites.length)return;setSavedRecords(old=>{const next={...old};for(const p of schedule.performances)if(favorites.includes(p.id))next[p.id]=p;return next;});},[schedule,favorites]);
+ const events=schedule?.performances||[];const upcoming=events.filter(p=>p.date>=today);const savedUpcoming=upcoming.filter(p=>favorites.includes(p.id));const archived=favorites.filter(id=>!savedUpcoming.some(p=>p.id===id));
+ const filtered=useMemo(()=>filterEvents(view==='favorites'?savedUpcoming:events,f,today),[schedule,f,view,favorites,today]);const groups=useMemo(()=>groupProductions(filtered),[filtered]);
+ const announced=(schedule?.announcements||[]).filter(a=>!['imaginative programs','dynamic concerts','open-air performance'].includes(normalize(a.title)));
+ const announcements=announced.filter(a=>(f.company==='all'||a.company===f.company)&&normalize(a.title+' '+a.company).includes(normalize(f.q)));
+ const selected=events.find(p=>p.id===eventId);const sessions=selected?events.filter(p=>productionKey(p)===productionKey(selected)&&p.date>=today).sort((a,b)=>a.date.localeCompare(b.date)||(a.time||'99').localeCompare(b.time||'99')):[];
+ const close=useCallback(()=>{if(window.history.state?.operaDetail)window.history.back();else setEventId('');},[]);
+ const openEvent=(id:string)=>{window.history.pushState({operaDetail:true},'',window.location.href);setEventId(id);};
+ const update=(key:keyof Filters,value:string)=>setF(old=>({...old,[key]:value}));
+ const navigate=(next:View)=>{window.history.pushState({},'',window.location.href);setView(next);setF(defaultFilters);setEventId('');setArchive(false);window.scrollTo({top:0,behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});};
+ const toggleSave=(p:Performance)=>{setFavorites(old=>old.includes(p.id)?old.filter(id=>id!==p.id):[...old,p.id]);setSavedRecords(old=>({...old,[p.id]:p}));};
+ const removeSaved=(id:string)=>{setFavorites(old=>old.filter(x=>x!==id));setSavedRecords(old=>{const next={...old};delete next[id];return next;});};
+ const chips=(Object.keys(f) as (keyof Filters)[]).filter(k=>f[k]!==defaultFilters[k]&&f[k]&&k!=='date'&&(view!=='announcements'||['q','company'].includes(k)));
+ const renderCard=(group:Production)=>{const p=group.sessions[0],title=displayTitle(p);return <article className="performance-card production-card" key={group.key}><div className="art-wrap"><Artwork item={p}/><button className={`save ${favorites.includes(p.id)?'saved':''}`} aria-pressed={favorites.includes(p.id)} aria-label={`${favorites.includes(p.id)?'Unsave':'Save'} ${title.title}, ${formatDate(p.date,true)}`} onClick={()=>toggleSave(p)}>{favorites.includes(p.id)?'♥':'♡'}</button></div><div className="production-body"><p className="company">{p.company}</p><span className="event-kind">{kindName(p.kind)}</span><h3>{title.title}</h3>{title.composer&&<p className="composer">{title.composer}</p>}<p className="venue-line">{p.venue||p.borough} · {p.borough}</p><p className="next-date"><strong>{formatDate(p.date)}</strong> · {formatTime(p.time)}</p><Freshness item={p}/><button className="details-button" onClick={()=>openEvent(p.id)} aria-label={`View dates for ${title.title}, ${p.company}`}>{group.sessions.length>1?`${group.sessions.length} matching dates · Details`:'View performance'} <span aria-hidden="true">↗</span></button></div></article>;};
+ return <><a className="skip-link" href="#main-content">Skip to content</a><header className="site-header"><button className="wordmark" onClick={()=>navigate('discover')} aria-label="OH-pera home">OH<span>—</span>pera!</button><nav aria-label="Primary navigation">{([['discover','Discover'],['favorites',`Saved (${savedUpcoming.length})`],['announcements','Seasons'],['about','About']] as [View,string][]).map(([key,label])=><button key={key} aria-current={view===key?'page':undefined} className={view===key?'active':''} onClick={()=>navigate(key)}>{label}</button>)}</nav><span className="header-location">New York City</span></header>
+ <main id="main-content">{view==='about'?<About onDiscover={()=>navigate('discover')}/>:<>
+ <section className={`hero ${view==='discover'?'illustrated-hero':'compact-hero'}`}><p className="eyebrow">{view==='discover'?'New York City · Find your next evening':view==='favorites'?'Your personal shortlist':'Looking ahead'}</p><h1>{view==='discover'?'An opera for your evening.':view==='favorites'?'Your saved dates.':'Seasons to look forward to.'}</h1><p className="intro">{view==='discover'?'Explore the operas, choose a date, and make a night of it.':view==='favorites'?'Saved on this device. Pick a performance when you’re ready to go.':'Announced productions with individual dates still to be confirmed.'}</p>
+ <div className="hero-search"><label className="field">Search {view==='announcements'?'announcements':'operas or composers'}<input type="search" placeholder="Try Macbeth or Mozart" value={f.q} onChange={e=>update('q',e.target.value)}/></label>{view!=='announcements'&&<label className="field">When<select value={f.range} onChange={e=>update('range',e.target.value)}>{Object.entries(dateNames).map(([k,v])=><option key={k} value={k}>{v}</option>)}</select></label>}{view!=='announcements'&&f.range==='date'&&<label className="field">Date<input type="date" min={today} value={f.date} onChange={e=>update('date',e.target.value)}/></label>}</div></section>
+ <section className="discover" aria-labelledby="results-heading"><div className="section-head"><div><p className="section-kicker">{view==='favorites'?'Your shortlist':view==='announcements'?'Coming seasons':'Explore NYC opera'}</p><h2 id="results-heading" tabIndex={-1}>{view==='favorites'?'Saved performances':view==='announcements'?'Season announcements':'Find your next opera'}</h2></div>{view==='discover'&&<button className="text-button" onClick={()=>navigate('announcements')}>Season announcements ({announced.length}) ↗</button>}</div>
+ {view==='favorites'&&<div className="segmented" aria-label="Saved date category"><button aria-pressed={!archive} onClick={()=>setArchive(false)}>Upcoming ({savedUpcoming.length})</button><button aria-pressed={archive} onClick={()=>setArchive(true)}>Past / unavailable ({archived.length})</button></div>}
+ {!(view==='favorites'&&archive)&&<><div className="discovery-toolbar"><label className="field">Company<select value={f.company} onChange={e=>update('company',e.target.value)}><option value="all">All companies</option>{companyOptions.slice(1).map(c=><option key={c}>{c}</option>)}</select></label>{view!=='announcements'&&<><label className="field">Event type<select value={f.kind} onChange={e=>update('kind',e.target.value)}><option value="all">All event types</option><option value="opera">Staged opera</option><option value="concert">Opera concerts</option><option value="screening">Cinema screenings</option></select></label><label className="field">Borough<select value={f.borough} onChange={e=>update('borough',e.target.value)}><option value="all">All boroughs</option>{['Manhattan','Brooklyn','Queens','The Bronx','Staten Island'].map(b=><option key={b}>{b}</option>)}</select></label><div className="segmented" aria-label="Results layout"><button aria-pressed={layout==='productions'} onClick={()=>setLayout('productions')}>Operas</button><button aria-pressed={layout==='dates'} onClick={()=>setLayout('dates')}>By date</button></div></>}</div>
+ {!!chips.length&&<div className="filter-chips" aria-label="Active filters">{chips.map(k=><button key={k} onClick={()=>setF(old=>({...old,[k]:defaultFilters[k],...(k==='range'?{date:''}:{})}))}>Remove {k==='range'?(f.range==='date'?f.date||'Choose a date':dateNames[f.range]):k==='kind'?kindName(f.kind):f[k]} ×</button>)}<button className="text-button" onClick={()=>setF(defaultFilters)}>Clear all</button></div>}</>}
+ <p className="results-summary" role="status">{!schedule?'Loading schedules…':view==='announcements'?`${announcements.length} announced productions · Dates are not confirmed` :view==='favorites'&&archive?`${archived.length} past or unavailable saved dates`:`${groups.length} ${groups.length===1?'production':'productions'} · ${filtered.length} ${filtered.length===1?'performance':'performances'} · Times in New York`}</p>
+ {schedule&&<p className="coverage-brief">{error?'Refresh unavailable. Showing previously loaded listings.':schedule.delivery==='bundled'?'Showing a saved schedule snapshot.':'Five organizations monitored; coverage is incomplete.'} Some listings need reconfirmation. <a href="#source-coverage">View sources and coverage</a></p>}
+ {!schedule?<div className="empty"><p>{error?'Schedules could not be loaded.':'Loading performances…'}</p>{error&&<button onClick={()=>setRefresh(n=>n+1)}>Try again</button>}</div>:view==='favorites'&&archive?<><p className="check-date">These dates have passed or are no longer present in the current feed. Missing does not mean cancelled. Search and outing filters do not apply here.</p>{archived.length?<ul className="archived-list">{archived.map(id=>{const p=savedRecords[id];return <li key={id}><div><strong>{p?.title?displayTitle(p).title:'Previously saved performance'}</strong><p>{p?.date?formatDate(p.date,true):'Details unavailable'}{p?.company?` · ${p.company}`:''}</p></div><button className="outline-button" onClick={()=>removeSaved(id)}>Remove saved date</button></li>;})}</ul>:<div className="empty"><h3>No archived dates</h3><p>Past and unavailable saved performances will appear here.</p></div>}</>:view==='announcements'?<><p className="check-date">Search and company filters apply here. Exact-date, borough, and event-type filters apply only to scheduled performances.</p>{announcements.length?<div className="announcement-grid">{announcements.map(a=><article key={a.id}><p className="company">{a.company}</p><span className="event-kind">Season announcement</span><h3>{a.title}</h3><p>{a.dateText}</p><p className="check-date">{a.note}</p><a href={a.sourceUrl} target="_blank" rel="noreferrer">View announcement ↗</a></article>)}</div>:<div className="empty"><h3>No matching announcements</h3><p>Try another company or search term.</p><button onClick={()=>setF(defaultFilters)}>Clear filters</button></div>}</>:filtered.length?(layout==='productions'?<div className="performance-grid">{groups.map(renderCard)}</div>:<ol className="date-list">{filtered.map(p=><li key={p.id}><div className="list-date"><strong>{formatDate(p.date,true)}</strong><span>{formatTime(p.time)}</span></div><div><span className="event-kind">{kindName(p.kind)}</span><h3>{displayTitle(p).title}</h3><p>{p.company} · {p.venue||p.borough}</p><Freshness item={p}/></div><button className="outline-button" onClick={()=>openEvent(p.id)}>Details</button><button className="outline-button" aria-pressed={favorites.includes(p.id)} onClick={()=>toggleSave(p)} aria-label={`${favorites.includes(p.id)?'Unsave':'Save'} ${displayTitle(p).title}, ${formatDate(p.date,true)}`}>{favorites.includes(p.id)?'♥ Saved':'♡ Save'}</button></li>)}</ol>):<div className="empty"><h3>{view==='favorites'&&!savedUpcoming.length?'No upcoming saved dates':f.range==='date'&&!f.date?'Choose a date above':'No matching performances'}</h3><p>{view==='favorites'&&!savedUpcoming.length?'Save a specific date from an opera card or its details. Past or missing saved dates are available in the archive.':`Try another date or company.${f.company!=='all'?' Some companies only have season announcements available.':''}`}</p><button onClick={()=>view==='favorites'&&!savedUpcoming.length?navigate('discover'):setF(defaultFilters)}>{view==='favorites'&&!savedUpcoming.length?'Discover operas':'Clear filters'}</button>{view==='discover'&&<button className="outline-button" onClick={()=>navigate('announcements')}>View season announcements</button>}</div>}
+ </section></>}
+ <section id="source-coverage" className="coverage-section"><details className="coverage"><summary>Sources &amp; coverage {schedule&&`· ${schedule.sources.filter(s=>s.status!=='live'||isStale(s.lastSuccessAt)).length} need attention`}</summary><p>We monitor five organizations, not every NYC opera company. Older listings and secondary sources are labeled. Missing events are not assumed cancelled. All times use New York local time.</p><div className="source-grid">{schedule?.sources.map(s=><article key={s.id}><a href={s.url} target="_blank" rel="noreferrer">{s.name} ↗</a><strong>{s.status==='error'?'Source unavailable':s.status==='fallback'?'Secondary snapshot':s.status==='partial'?'Partial coverage':'Connected'}{isStale(s.lastSuccessAt)?' · Out of date':''}</strong><p>{s.message}</p><small>{s.lastSuccessAt?`Checked ${new Date(s.lastSuccessAt).toLocaleString('en-US',{timeZone:'America/New_York'})} ET`:'Not yet verified'}</small></article>)}</div></details></section>
+ </main><footer><div className="wordmark">OH<span>—</span>pera!</div><p>Find your next evening.</p><p className="footer-note">Confirm availability with the presenter before booking. Artwork is AI-generated, inspired by each opera, and does not depict actual productions.</p></footer>
+ {selected&&<ProductionDialog item={selected} sessions={sessions.some(p=>p.id===selected.id)?sessions:[selected,...sessions]} onClose={close} onSelect={setEventId} saved={favorites.includes(selected.id)} onSave={()=>toggleSave(selected)}/>}
+ {!!eventId&&schedule&&!selected&&<div className="unavailable-link" role="status">This shared performance is no longer available in the current schedule. <button onClick={close}>Dismiss</button></div>}
+ </>;
+}
 function About({onDiscover}:{onDiscover:()=>void}){return <section className="about-page"><div><p className="eyebrow">About OH-pera!</p><h1>One city.<br/>Many stages.<br/>More discovery.</h1></div><div className="about-copy"><p className="about-lead">Opera in New York shouldn’t require five tabs and a perfect memory.</p><p>OH-pera! monitors the Metropolitan Opera, New York City Opera, Heartbeat Opera, Bronx Opera, and opera presented at BAM. Coverage is expanding. Some sources provide season announcements or older snapshots rather than current individual dates; each listing shows its verification status.</p><p>We don’t sell tickets. When you find something you love, we send you directly to the presenter’s official website.</p><button onClick={onDiscover}>Discover what’s on <span>↗</span></button><div className="company-list">{companyOptions.slice(1).map((name,index)=><div key={name}><span>0{index+1}</span>{name}</div>)}</div></div></section>}

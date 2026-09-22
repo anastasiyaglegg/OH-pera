@@ -76,3 +76,9 @@ or grant access. GitHub collaborator access alone does not grant Sites deploymen
 ## Artwork
 
 Twelve original AI-generated conceptual illustrations are stored in `public/images/operas`: one NYC opera hero and eleven opera artworks shared by performances of the same work. These are not official production photographs. Cards load images lazily; unrecognized future titles retain the existing abstract fallback. JPEG assets are optimized for delivery, with original generation files retained outside the repository.
+
+## Discovery and saved dates
+
+Discovery groups dates by work, presenter, event type, and venue, with a chronological list as an alternative. Search matches titles, composers, companies, and venues without requiring accents. Date filters use New York dates; This weekend means the upcoming Saturday/Sunday (or the remaining Sunday). Filters and selected performances are reflected in shareable query parameters. Browser Back returns from details and navigation.
+
+Favorites remain specific performance dates stored on the current device. Saved records preserve descriptive details for the Past / unavailable archive; disappeared dates are not inferred to be cancelled. Season announcements have separate search/company filters and omit generic marketing headings. Performance details use a native modal dialog for focus containment, Escape dismissal, and focus restoration.
