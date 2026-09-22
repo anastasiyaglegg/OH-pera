@@ -3,12 +3,22 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { formatTime, isStale, nycDate, type Performance, type Schedule } from '../lib/schedule';
+const operaArtwork:Record<string,string> = {
+ 'macbeth':'macbeth','cosi fan tutte':'cosi-fan-tutte','la boheme':'la-boheme',
+ 'lincoln in the bardo':'lincoln-in-the-bardo','medea':'medea','samson et dalila':'samson-et-dalila',
+ 'la fanciulla del west':'la-fanciulla-del-west','silent night':'silent-night','manon':'manon','otello':'otello','parsifal':'parsifal'
+};
+function artworkFor(title:string){const key=title.split(' (')[0].normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();return operaArtwork[key];}
 const companyOptions = ['All companies','Metropolitan Opera','New York City Opera','Heartbeat Opera','Bronx Opera','BAM'];
 
 function formatDate(date:string, long=false){ return new Intl.DateTimeFormat('en-US',long?{weekday:'long',month:'long',day:'numeric',year:'numeric'}:{month:'short',day:'numeric'}).format(new Date(`${date}T12:00:00`)); }
 
 function Artwork({item,large=false}:{item:Performance;large?:boolean}){
-  return <div className={`art art-${item.palette} ${large?'art-large':''}`} role="img" aria-label={`Abstract artwork for ${item.title}`}><span className="art-mark">{item.label}</span><span className="art-title">{item.title.slice(0,1)}</span></div>;
+  const artwork=artworkFor(item.title);
+  return <div className={`art art-${item.palette} ${artwork?'art-illustrated':''} ${large?'art-large':''}`}>
+    {artwork?<img src={`/images/operas/${artwork}.jpg`} alt={`Concept illustration inspired by ${item.title}`} loading={large?'eager':'lazy'} decoding="async" width={1536} height={1024}/>:<span className="art-title" aria-hidden="true">{item.title.slice(0,1)}</span>}
+    <span className="art-mark">{item.label}</span>
+  </div>;
 }
 
 export default function Home(){
@@ -68,7 +78,7 @@ export default function Home(){
     </header>
 
     {view==='about'?<About onDiscover={()=>navigate('discover')}/>:<>
-      <section className={`hero ${view==='favorites'?'favorites-hero':''}`}>
+      <section className={`hero ${view==='favorites'?'favorites-hero':'illustrated-hero'}`}>
         <p className="eyebrow">{view==='favorites'?'Your personal shortlist':'New York City · Upcoming opera'}</p>
         <h1>{view==='favorites'?<>The operas you<br />don’t want to miss.</>:<>What opera can<br />I see in NYC?</>}</h1>
         <p className="intro">{view==='favorites'?'Save performances that catch your eye, then find them together here.':<>Discover upcoming opera across New York, with official sources and clear information about when schedules were checked.</>}</p>
@@ -99,7 +109,7 @@ export default function Home(){
       </section>
     </>}
 
-    <footer><div className="wordmark">OH<span>—</span>pera!</div><p>Opera across New York City, all in one place.</p><p className="footer-note">Source-linked schedules · Confirm availability with the presenter before booking.</p></footer>
+    <footer><div className="wordmark">OH<span>—</span>pera!</div><p>Opera across New York City, all in one place.</p><p className="footer-note">Source-linked schedules · Confirm availability with the presenter before booking. Artwork is AI-generated and inspired by each opera; it does not depict actual productions.</p></footer>
 
     {selected&&<div className="modal-backdrop" onMouseDown={(e)=>{if(e.currentTarget===e.target)setSelected(null)}}><section className="detail-modal" role="dialog" aria-modal="true" aria-labelledby="detail-title">
       <button className="close" onClick={()=>setSelected(null)} aria-label="Close details">×</button>

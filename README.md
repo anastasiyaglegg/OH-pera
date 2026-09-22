@@ -72,3 +72,7 @@ removals, overseas exclusions, announcements, and screening classification.
 The original Sites project ID is preserved in `.openai/hosting.json`.
 The current connected account cannot access that Site. Its owner must publish these changes
 or grant access. GitHub collaborator access alone does not grant Sites deployment access.
+
+## Artwork
+
+Twelve original AI-generated conceptual illustrations are stored in `public/images/operas`: one NYC opera hero and eleven opera artworks shared by performances of the same work. These are not official production photographs. Cards load images lazily; unrecognized future titles retain the existing abstract fallback. JPEG assets are optimized for delivery, with original generation files retained outside the repository.
