@@ -19,12 +19,5 @@ export default function HeroVideo() {
         tabIndex={-1} allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowFullScreen
         referrerPolicy="strict-origin-when-cross-origin" />}
     </div>
-    <div className="hero-film-tools">
-      <button type="button" className="hero-film-toggle" onClick={() => setEnabled(v => !v)}
-        aria-label={enabled ? 'Stop Maria Callas video' : 'Play Maria Callas video'}>
-        <span aria-hidden="true">{enabled ? '□' : '▷'}</span> {enabled ? 'Stop' : 'Play'} video
-      </button>
-      <a href="https://www.edsullivan.com/artists/maria-callas/" target="_blank" rel="noreferrer">Callas · New York, 1956 ↗</a>
-    </div>
   </>;
 }
