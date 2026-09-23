@@ -3,7 +3,7 @@
 ## Direction
 A contemporary opera salon: theatrical editorial typography, restrained glass surfaces, and fine architectural geometry. The references are the grandeur of an opera house, the clarity and restraint of Apple product pages, and Renaissance studies of proportion. This is an original identity, not a reproduction of another site's brand.
 
-The graphic audit identified conflicting flat cards, rectangular controls, and theatrical imagery. The new stylesheet replaces the accumulated overrides with a single coherent system across Discover, Saved, Seasons, About, sources, and performance details.
+The graphic audit identified conflicting flat cards, rectangular controls, and theatrical imagery. The new stylesheet replaces the accumulated overrides with a single coherent system across Discover, Saved, Coming Soon, About, sources, and performance details.
 
 ## Foundations
 - Pearl background: #F7F4EF. Warm ink: #251C20. Oxblood action color: #76283E. Brass ornament: #987B50.
