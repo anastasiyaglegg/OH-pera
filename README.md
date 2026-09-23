@@ -82,3 +82,13 @@ Twelve original AI-generated conceptual illustrations are stored in `public/imag
 Discovery groups dates by work, presenter, event type, and venue, with a chronological list as an alternative. Search matches titles, composers, companies, and venues without requiring accents. Date filters use New York dates; This weekend means the upcoming Saturday/Sunday (or the remaining Sunday). Filters and selected performances are reflected in shareable query parameters. Browser Back returns from details and navigation.
 
 Favorites remain specific performance dates stored on the current device. Saved records preserve descriptive details for the Past / unavailable archive; disappeared dates are not inferred to be cancelled. Season announcements have separate search/company filters and omit generic marketing headings. Performance details use a native modal dialog for focus containment, Escape dismissal, and focus restoration.
+
+## PRD readiness and editorial content
+
+Run `npm run data:audit` to inspect the next 60 days without implying comprehensive coverage. See [launch readiness](docs/launch-readiness.md) for source inventory, maintenance procedure, and unresolved release gates.
+
+Venue, company, and date filters compose and are preserved in shareable URLs. Performance details include original work introductions with research links; they do not certify the accuracy of a schedule or describe an unverified staging. Source-check timestamps reflect retrieval, not independent editorial verification. Older means more than 48 hours since the source check.
+
+### Curated schedule gaps
+
+Maintain individually verified NYC dates in `data/curated.json`; see `docs/launch-readiness.md` for evidence and review rules. Run `npm run test:data`, then `npm run data:refresh` and `npm run data:audit`. Manual review dates are never refreshed automatically. Overdue entries become unconfirmed, and the public API preserves curated entries when a newer remote feed is available.

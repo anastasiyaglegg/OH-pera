@@ -1,3 +1,5 @@
+import curated from '../../../data/curated.json';
+import {mergeCurated,type CuratedPerformance} from '../../../lib/curated';
 import bundled from '../../../data/schedule.json';
 import type {Schedule} from '../../../lib/schedule';
 const FEED='https://raw.githubusercontent.com/anastasiyaglegg/OH-pera/main/data/schedule.json';
@@ -23,5 +25,7 @@ export async function GET(){
      }
    }
  }catch(error){console.warn('Latest schedule snapshot unavailable:',error instanceof Error?error.message:'request failed');}
- return Response.json({...schedule,delivery},{headers:{'Cache-Control':'public, max-age=60, s-maxage=300','X-Content-Type-Options':'nosniff'}});
+ const today=new Intl.DateTimeFormat('en-CA',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+ const performances=mergeCurated(schedule.performances,curated as CuratedPerformance[],today);
+ return Response.json({...schedule,performances,delivery},{headers:{'Cache-Control':'public, max-age=60, s-maxage=300','X-Content-Type-Options':'nosniff'}});
 }

@@ -27,7 +27,7 @@ export async function collect(source,now,get=fetchPage){
  if(source.id==='bronx')return parseBronx(await get(source.url),source,now,source.url);
  if(source.id==='nyco')return parseNyco(await get(source.url),source,now,source.url);
  if(source.id==='bam'){
-   const home=await get(source.url),$=load(home);
+   const home=await get(source.url);
    // Discover the current HD series from the official programs page, instead of fixing a season year.
    const programs=await get('https://www.bam.org/programs'),p=load(programs);
    const series=p('a[href]').toArray().map(e=>({url:p(e).attr('href'),text:clean(p(e).text())})).find(a=>/The Met: Live in HD/.test(a.text)&&/20\d{2}/.test(a.text));

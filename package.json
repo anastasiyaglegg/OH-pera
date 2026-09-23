@@ -11,7 +11,8 @@
     "start": "vinext start",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
     "test:data": "node --test tests/*.test.mjs",
-    "data:refresh": "node scripts/refresh-data.mjs"
+    "data:refresh": "node scripts/refresh-data.mjs",
+    "data:audit": "node scripts/audit-data.mjs"
   },
   "dependencies": {
     "next": "16.2.6",
