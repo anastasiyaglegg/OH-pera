@@ -22,3 +22,14 @@ The graphic audit identified conflicting flat cards, rectangular controls, and t
 
 ## Scope
 Presentation changes preserve production grouping, saved dates, source notices, date selection, shareable links, and the accessible native dialog. Quick date pills mirror the date selector; they are shortcuts to the same state.
+
+
+## New York Art Deco refinement
+
+The discovery hero occupies about 85% of the viewport, with a 680px desktop and 660px mobile minimum. Larger Bodoni lettering and generous space give the performance film a marquee treatment. Brass corner rules, double-line section markers, and restrained artwork frames introduce Art Deco while keeping the glass cards and pill filters. The Explore performances link jumps past the hero with clearance for the sticky header.
+
+Navigation begins opaque and becomes pearl glass after 32px of scrolling. Reduced-transparency, increased-contrast, and unsupported-blur environments retain an opaque background for legibility.
+
+Art Deco is ornamentation only: no large geometric overlays over the performance, text, or controls. Keep decorative work at the edges and in small dividers.
+
+The hero search panel deliberately retains translucent glass, including under increased-contrast/reduced-transparency preferences, per the requested visual treatment. Its controls use light translucent fills and dark text. Other surfaces, including the scrolling header, retain their opaque accessibility fallbacks.
