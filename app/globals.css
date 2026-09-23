@@ -86,3 +86,7 @@ footer{border-top:3px double #987b5070}
 .illustrated-hero .hero-search input,.illustrated-hero .hero-search select{background-color:rgba(255,253,249,.78);border-color:#ffffff99;box-shadow:inset 0 1px 0 #ffffffb3,0 2px 8px #0000000d;color:#251c20;text-shadow:none}
 .illustrated-hero .hero-search input::placeholder{color:#65585e}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.illustrated-hero .hero-search{background:rgba(35,28,33,.88)}}
+
+/* One warm-gold rim language across interactive controls. */
+.site-header nav button,.segmented button{border:1px solid #d6b577}
+.date-shortcuts button,.discovery-toolbar .segmented,.filter-chips button,.save,.details-button,.outline-button,.close,.ticket-button,.empty button,.about-copy button,.unavailable-link button,.hero-film-toggle{border-color:#d6b577!important}
