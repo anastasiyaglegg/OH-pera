@@ -55,7 +55,6 @@ export default function HeroVideo() {
       >
         {muted ? 'Sound on' : 'Sound off'}
       </button>
-      <a href="#film-credit">Video credit</a>
     </div>}
   </>;
 }

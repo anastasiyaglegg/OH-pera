@@ -16,3 +16,14 @@ test('venue and company filters compose with dates and preserve unknown venues',
  assert.equal(filterEvents([event,other,unknown],{...filters,venue:'all'},'2026-09-22').length,3);
  assert.equal(filterEvents([event],{...filters,company:'BAM'},'2026-09-22').length,0);
 });
+
+
+test('season spans the calendar year and rolls over on September 1',()=>{
+ assert.equal(matchesDate('2027-08-31','2026-09-24','season',''),true);
+ assert.equal(matchesDate('2027-09-01','2026-09-24','season',''),false);
+ assert.equal(matchesDate('2026-09-23','2026-09-24','season',''),false);
+ assert.equal(matchesDate('2027-08-31','2027-01-01','season',''),true);
+ assert.equal(matchesDate('2027-09-01','2027-08-31','season',''),false);
+ assert.equal(matchesDate('2028-08-31','2027-09-01','season',''),true);
+ assert.equal(filterEvents([event],{...defaultFilters,range:'season',company:'Other'},'2026-09-22').length,0);
+});

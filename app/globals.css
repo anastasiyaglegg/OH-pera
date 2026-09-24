@@ -27,13 +27,13 @@
 .hero-film video{width:100%;height:100%;object-fit:cover;object-position:45% center}
 .illustrated-hero:before{z-index:-2;background:linear-gradient(90deg,#100e14 5%,#100e14ed 30%,#100e1480 57%,#100e1410 90%)}
 
-.hero-film-tools{position:absolute;top:24px;left:7vw;z-index:3;display:flex;align-items:center;gap:14px;font:12px var(--sans)}
+.hero-film-tools{position:absolute;top:48px;left:max(48px,7vw);z-index:3;display:flex;align-items:center;gap:14px;font:12px var(--sans)}
 .hero-film-toggle{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:8px 16px;border:1px solid #d6b577b8;border-radius:999px;background:rgba(23,18,27,.16);color:#f2d9b7;text-shadow:0 1px 5px #000;box-shadow:inset 0 1px 0 #f2d9b726;backdrop-filter:blur(7px) saturate(110%);-webkit-backdrop-filter:blur(7px) saturate(110%);cursor:pointer}
 .hero-film-toggle:hover{background:rgba(42,32,45,.28);border-color:#d6b577}.hero-film-toggle:disabled{cursor:wait;opacity:.6}
 .hero-film-tools a{color:#fff9ef;text-underline-offset:4px;display:inline-flex;align-items:center;min-height:44px;padding:0 4px}
 .film-credit{grid-column:1/-1;max-width:950px;font:12px/1.7 var(--sans);color:var(--muted);scroll-margin-top:140px}
 .film-credit a{text-decoration:underline;text-underline-offset:3px}
-@media(max-width:800px){.illustrated-hero{min-height:660px;min-height:max(660px,85svh);padding:64px 24px 124px}.hero-film{inset:0;background-position:43% center}.hero-film video{object-position:43% center}.illustrated-hero:before{background:linear-gradient(90deg,#100e14e8,#100e14b5 65%,#100e1466)}.hero-film-tools{top:18px;left:22px}.hero-film-tools a{display:none}.film-credit{font-size:12px}}
+@media(max-width:800px){.illustrated-hero{min-height:660px;min-height:max(660px,85svh);padding:64px 24px 124px}.hero-film{inset:0;background-position:43% center}.hero-film video{object-position:43% center}.illustrated-hero:before{background:linear-gradient(90deg,#100e14e8,#100e14b5 65%,#100e1466)}.hero-film-tools{top:36px;left:32px}.hero-film-tools a{display:none}.film-credit{font-size:12px}}
 
 /* New York Art Deco: architectural steps, brass rules and a generous marquee. */
 .site-header{transition:background .25s,box-shadow .25s,border-color .25s;background:#f7f4ef;border-bottom-color:#987b5055}
@@ -150,3 +150,39 @@ footer{border-top:3px double #987b5070}
 .announcement-body{padding:26px}
 .announcement-body h3{margin-top:12px}
 @media(prefers-reduced-motion:reduce){.announcement-grid article:hover .announcement-art img{transform:none}}
+/* A single discovery toolbar and compact supporting disclosures. */
+.unified-filters{align-items:end;gap:12px;background:rgba(255,253,249,.48)}
+.unified-filters .search-field{flex:2;min-width:220px}
+.more-filters{flex-basis:100%;min-width:0}
+.more-filters summary,.detail-sources summary,.film-credit summary{list-style:none;cursor:pointer;min-height:44px;display:flex;align-items:center;color:var(--gold);font-size:12px;text-decoration:underline;text-underline-offset:4px}
+.more-filters summary::-webkit-details-marker,.detail-sources summary::-webkit-details-marker,.film-credit summary::-webkit-details-marker{display:none}
+.secondary-filters{display:flex;gap:12px;padding:8px 0}
+.secondary-filters .field{flex:1;min-width:0}
+.detail-sources{margin-top:20px;border-top:1px solid var(--line)}
+.source-links{display:flex;gap:16px;flex-wrap:wrap}
+.dialog-copy .detail-actions{margin:12px 0 24px}
+.dialog-copy .production-facts{margin-bottom:12px}
+.dialog-copy .synopsis{font-size:18px;line-height:1.5}
+.compact-hero{padding-bottom:24px}
+.compact-hero h1{font-size:44px}
+.film-credit p{margin-top:0}
+@media(max-width:800px){
+ .discovery-toolbar.unified-filters{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+ .unified-filters .field{min-width:0}
+ .unified-filters .search-field,.unified-filters .more-filters{grid-column:1/-1}
+ .unified-filters .field input,.unified-filters .field select{font-size:16px}
+ .secondary-filters{flex-direction:column}
+ .compact-hero h1{font-size:36px}
+}
+
+/* Gold outlines retain the existing glass and selected-state backgrounds. */
+:root body button:not(.wordmark),:root body .ticket-button{
+ border:1px solid #d6b577;
+}
+
+/* Keep source transparency available as a quiet footer disclosure. */
+.sources-updates{grid-column:1/-1;font-size:12px;line-height:1.6;color:var(--muted)}
+.sources-updates>summary{display:list-item;width:fit-content;cursor:pointer;min-height:44px;align-content:center;text-decoration:underline;text-underline-offset:4px}
+.sources-updates>summary:focus-visible{outline:2px solid var(--gold);outline-offset:4px}
+.sources-updates>p{max-width:820px}
+.sources-updates .source-grid{margin-bottom:12px}
