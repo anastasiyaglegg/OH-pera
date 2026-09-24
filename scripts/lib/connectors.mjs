@@ -1,10 +1,10 @@
+import {fetchTrustedText} from '../../lib/safe-fetch.ts';
+import {sourceHosts} from '../../lib/security.ts';
 import {load} from 'cheerio';
 import {event,nycToday} from './core.mjs';
 import {parseHeartbeat,parseBronx,parseNyco,bamCandidates,parseBamDetail,parseMetFallback,clean} from './parsers.mjs';
 export async function fetchPage(url){
- const r=await fetch(url,{headers:{'User-Agent':'OH-pera/1.0 (NYC performance schedule; github.com/anastasiyaglegg/OH-pera)','Accept':'text/html,application/json'},signal:AbortSignal.timeout(25000)});
- if(!r.ok)throw new Error(`Source returned HTTP ${r.status}`);
- const html=await r.text();if(html.length>6000000)throw new Error('Source response exceeds size limit');
+ const html=await fetchTrustedText(url,sourceHosts);
  if(/enqueuetoken|metoperawaitingroom|Just a moment\.\.\.|cf-chl-/i.test(html))throw new Error('Official source is behind a waiting room or access challenge');
  return html;
 }
