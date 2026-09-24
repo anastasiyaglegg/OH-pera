@@ -86,6 +86,10 @@ footer{border-top:3px double #987b5070}
 .illustrated-hero .hero-search input::placeholder{color:#65585e}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.illustrated-hero .hero-search{background:rgba(35,28,33,.88)}}
 
+/* One warm-gold rim language across interactive controls. */
+.site-header nav button,.segmented button{border:1px solid #d6b577}
+.field input,.field select,.date-shortcuts button,.discovery-toolbar .segmented,.filter-chips button,.save,.details-button,.outline-button,.close,.ticket-button,.empty button,.about-copy,.about-copy button,.coverage,.source-grid article,.unavailable-link button,.hero-film-toggle{border-color:#d6b577!important}
+
 /* Text labels carry navigation; omit directional decorations. */
 .coverage summary{list-style:none}
 .coverage summary::-webkit-details-marker{display:none}
