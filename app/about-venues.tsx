@@ -1,0 +1,43 @@
+const venues = [
+  {
+    id: 'met', name: 'Metropolitan Opera', year: '1883', place: 'Lincoln Center · Manhattan',
+    caption: 'Metropolitan Opera House',
+    bio: 'Founded in 1883, the Met began on Broadway and 39th Street. In 1966, it moved to Lincoln Center, where its five soaring entrance arches became a familiar face of opera in New York.',
+    source: 'https://www.metopera.org/about/the-met/',
+  },
+  {
+    id: 'city', name: 'New York City Opera', year: '1943', place: 'A citywide company · Manhattan roots',
+    caption: 'New York City Center · original home',
+    bio: 'Created in 1943 as “The People’s Opera,” City Opera gave its first performance at City Center in 1944. Its history is intertwined with affordable opera, American talent, and early breakthroughs for Black opera singers.',
+    source: 'https://www.nycopera.com/our-history',
+  },
+  {
+    id: 'bam', name: 'Brooklyn Academy of Music', year: '1861', place: 'Fort Greene · Brooklyn',
+    caption: 'BAM · Lafayette Avenue building',
+    bio: 'BAM began in 1861. Its Lafayette Avenue home opened in 1908 with celebrations that included the Met’s Faust, starring Enrico Caruso and Geraldine Farrar. Today, its stages bring opera into conversation with theater, dance, and film.',
+    source: 'https://www.bam.org/about/history/bam-hamm-archives/bam-through-the-years',
+  },
+  {
+    id: 'bronx', name: 'Bronx Opera', year: '1967', place: 'Bedford Park · The Bronx',
+    caption: 'Lovinger Theatre · Lehman College',
+    bio: 'Founded in 1967, Bronx Opera built its identity around fully staged opera sung in English, pairing familiar works with rarities. Its home at Lehman College’s Lovinger Theatre anchors a tradition of community access and education.',
+    source: 'https://bronxopera.org/history-and-mission/',
+  },
+  {
+    id: 'heartbeat', name: 'Heartbeat Opera', year: '2014', place: 'Intimate stages · New York City',
+    caption: 'Judson Memorial Church · a performance venue',
+    bio: 'Ethan Heard and Louisa Proske founded Heartbeat in 2014 to rethink classic opera through intimate productions and fresh musical arrangements. Its work brings new perspectives to familiar scores; Judson is one of the venues in its story.',
+    source: 'https://heartbeatopera.squarespace.com/mission',
+  },
+] as const;
+
+export default function AboutVenues() {
+  return <section className="about-venues" aria-labelledby="venues-heading">
+    <div className="venues-heading"><div><p className="eyebrow">The companies behind the curtain</p><h2 id="venues-heading">New York, in five stages.</h2></div><p>A little history before the overture. Meet the organizations on OH-pera and the buildings connected to their stories.</p></div>
+    <div className="venue-grid">{venues.map(venue => <article className="venue-profile" key={venue.id}>
+      <figure><img className="venue-sketch" src={`/images/venues/${venue.id}-pencil.png`} alt={`Pencil sketch inspired by ${venue.caption}`} width={1536} height={1024} loading="lazy" decoding="async"/><figcaption>{venue.caption}</figcaption></figure>
+      <div className="venue-profile-copy"><p className="venue-era">Est. {venue.year}<span aria-hidden="true"> / </span>{venue.place}</p><h3>{venue.name}</h3><p className="venue-bio">{venue.bio}</p><div className="venue-links"><a href={venue.source} target="_blank" rel="noreferrer" aria-label={`Read ${venue.name}’s history`}>Explore the history</a></div></div>
+    </article>)}</div>
+    <p className="venues-note">AI-generated pencil illustrations are artistic interpretations of the buildings. Historic homes and occasional venues are labeled; check each performance for its location.</p>
+  </section>;
+}
