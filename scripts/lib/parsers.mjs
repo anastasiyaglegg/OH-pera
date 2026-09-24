@@ -12,7 +12,7 @@ export function parseHeartbeat(html,source,now,url) {
  $('h2').each((_,el)=>{const dates=clean($(el).text()); if(!/\b20\d{2}\b/.test(dates)||!dates.includes('|'))return;
  const block=$(el).parent(),title=clean(block.find('p').first().text());if(!title)return;
  const detail=safeUrl(block.find('p a').first().attr('href'),url)||url;
- const ticket=block.find('a').toArray().map(e=>safeUrl($(e).attr('href'),url)).find(u=>u?.includes('universe.com/'))||null;
+ const ticket=block.find('a').toArray().map(e=>safeUrl($(e).attr('href'),url)).find(u=>u&&['www.universe.com','universe.com'].includes(new URL(u).hostname))||null;
  announcements.push({id:idFor(source.id,title,dates),sourceId:source.id,company:source.name,title,dateText:dates,sourceUrl:detail,ticketUrl:ticket,checkedAt:now,note:'Season run announced. Individual performance dates and times are not yet verified.'});});
  if(!announcements.length)throw new Error('Season page format changed; no dated productions recognized.');
  return {performances:[],announcements,status:'partial',message:'Season announcements verified; individual performance sessions still require the ticketing feed.'};

@@ -1,3 +1,4 @@
+import {validPerformance} from './security.ts';
 import type {Performance} from './schedule.ts';
 
 export type CuratedPerformance = Performance & {
@@ -13,7 +14,7 @@ export function validateCurated(entries:CuratedPerformance[]):void {
  if(!Array.isArray(entries))throw new Error('Curated listings must be an array');
  const ids=new Set<string>();const keys=new Set<string>();
  for(const p of entries){
-  if(!p||!p.id?.startsWith('curated-')||ids.has(p.id)||keys.has(key(p))||p.verification!=='manual'||
+  if(!validPerformance(p)||!p.id?.startsWith('curated-')||ids.has(p.id)||keys.has(key(p))||p.verification!=='manual'||
    !p.title?.trim()||!p.company?.trim()||!p.sourceId?.trim()||!p.venue?.trim()||!p.reviewedBy?.trim()||!p.evidenceNote?.trim()||
    !validDate(p.date)||!validDate(p.reviewBy)||!Number.isFinite(Date.parse(p.checkedAt))||p.reviewBy<p.checkedAt.slice(0,10)||
    !safeUrl(p.sourceUrl)||(p.ticketUrl!==null&&!safeUrl(p.ticketUrl))||

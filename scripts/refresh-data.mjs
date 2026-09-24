@@ -1,3 +1,4 @@
+import {validSchedule} from '../lib/security.ts';
 import {DatabaseSync} from 'node:sqlite';
 import {mkdir,readFile,writeFile,rename} from 'node:fs/promises';
 import {SOURCES,mergeSource,nycToday} from './lib/core.mjs';
@@ -17,6 +18,7 @@ const results=await Promise.all(SOURCES.map(async source=>{try{return {source,re
 const snapshot={schemaVersion:1,generatedAt:now,timezone:'America/New_York',coverage:'Five configured organizations; incomplete citywide coverage.',performances:[],announcements:[],sources:[]};
 for(const {source,result} of results){const merged=mergeSource(previous,result,source,now);put.run(source.id,JSON.stringify(merged),now);snapshot.performances.push(...merged.performances);snapshot.announcements.push(...merged.announcements);snapshot.sources.push(merged.source);console.log(`${source.name}: ${merged.source.status}; ${merged.performances.length} dated listings; ${merged.announcements.length} announcements`);}
 snapshot.performances=mergeCurated(snapshot.performances,curated,nycToday());
+if(!validSchedule(snapshot))throw Error('Refusing to publish an invalid schedule');
 await writeFile('data/schedule.json.tmp',JSON.stringify(snapshot,null,2)+'\n');await rename('data/schedule.json.tmp','data/schedule.json');db.close();
 console.log(`Saved ${snapshot.performances.length} upcoming listings. Source problems remain visible in the coverage panel.`);
 if(snapshot.sources.every(s=>s.status==='error'))process.exitCode=1;
