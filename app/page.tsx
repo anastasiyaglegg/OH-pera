@@ -2,6 +2,7 @@
 import {readSaved} from '../lib/saved';
 import {validSchedule} from '../lib/security';
 import HeroVideo from './hero-video';
+import AboutVenues from './about-venues';
 import {operaIntroduction} from '../lib/opera-content';
 import {useCallback,useEffect,useRef,useState} from 'react';
 import {formatTime,isStale,nycDate,type Performance,type Schedule} from '../lib/schedule';
@@ -119,4 +120,4 @@ export default function Home(){
  {!!eventId&&schedule&&!selected&&<div className="unavailable-link" role="status">This shared performance is no longer available in the current schedule. <button onClick={close}>Dismiss</button></div>}
  </>;
 }
-function About({onDiscover}:{onDiscover:()=>void}){return <section className="about-page"><div><p className="eyebrow">About OH-pera!</p><h1>One city.<br/>Many stages.<br/>More discovery.</h1></div><div className="about-copy"><p className="about-lead">Opera in New York shouldn’t require five tabs and a perfect memory.</p><p>Discover opera across New York City with the organizations below. Coverage is expanding; each listing shows its source status.</p><p>We don’t sell tickets. When you find something you love, we send you directly to the presenter’s official website.</p><button onClick={onDiscover}>Discover what’s on</button><div className="company-list">{companyOptions.slice(1).map((name,index)=><div key={name}><span>0{index+1}</span>{name}</div>)}</div></div></section>}
+function About({onDiscover}:{onDiscover:()=>void}){return <section className="about-page"><div><p className="eyebrow">About OH-pera!</p><h1>One city.<br/>Many stages.<br/>More discovery.</h1></div><div className="about-copy"><p className="about-lead">Opera in New York shouldn’t require five tabs and a perfect memory.</p><p>Discover opera across New York City with the organizations below. Coverage is expanding; each listing shows its source status.</p><p>We don’t sell tickets. When you find something you love, we send you directly to the presenter’s official website.</p><button onClick={onDiscover}>Discover what’s on</button></div><AboutVenues/></section>}
