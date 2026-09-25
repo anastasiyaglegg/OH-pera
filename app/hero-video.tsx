@@ -1,6 +1,6 @@
 'use client';
 import {useRef,useState} from 'react';
-const PLAYER_ORIGIN='https://www.youtube-nocookie.com';
+const PLAYER_ORIGIN='https://www.youtube.com';
 export default function HeroVideo(){
  const [enabled,setEnabled]=useState(false),[ready,setReady]=useState(false),[muted,setMuted]=useState(true);
  const playerRef=useRef<HTMLIFrameElement>(null);

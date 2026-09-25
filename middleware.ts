@@ -17,7 +17,7 @@ export function middleware(request:NextRequest){
  const csp=["default-src 'self'","base-uri 'none'","object-src 'none'","frame-ancestors 'none'","form-action 'self'",
   `script-src 'self' ${dev?"'unsafe-inline' 'unsafe-eval'":`'nonce-${nonce}'`}`,
   "style-src 'self' 'unsafe-inline'","img-src 'self' data:","font-src 'self'",
-  `connect-src 'self'${dev?' ws: wss:':''}`,"frame-src https://www.youtube-nocookie.com",
+  `connect-src 'self'${dev?' ws: wss:':''}`,"frame-src https://www.youtube.com https://www.youtube-nocookie.com",
  ].join('; ');
  const headers=new Headers(request.headers);
  // Override client-supplied CSP/nonce headers before the renderer sees them.
