@@ -209,3 +209,49 @@ footer{border-top:3px double #987b5070}
 .venues-note{font:11px/1.8 var(--sans);color:var(--muted);border-top:1px solid var(--line);margin:36px 0 0;padding-top:20px;max-width:760px}
 @media(max-width:1000px){.venue-grid{grid-template-columns:repeat(4,minmax(0,1fr));column-gap:32px}.venue-profile,.venue-profile:nth-child(4){grid-column:span 2}.venue-profile:nth-child(5){grid-column:2/span 2}.venues-heading{align-items:start;flex-direction:column;gap:18px}.venues-heading>p{max-width:520px}}
 @media(max-width:600px){.about-venues{padding-top:16px}.venue-grid{grid-template-columns:minmax(0,1fr);row-gap:36px}.venue-profile,.venue-profile:nth-child(4),.venue-profile:nth-child(5){grid-column:1;grid-row:auto;grid-template-rows:auto;gap:22px;margin-bottom:0}.venue-profile figure,.venue-profile-copy{grid-row:auto;grid-template-rows:auto;gap:14px}.venue-profile h3{font-size:30px}.venue-profile figcaption{margin:0}.venues-heading{margin-bottom:30px}}
+
+/* Account access and authentication forms. */
+.account-menu{display:flex;align-items:center;justify-content:flex-end;gap:8px;min-width:190px}
+.account-menu>button{min-height:40px;padding:8px 14px;border:1px solid #d6b577;border-radius:999px;background:transparent;color:var(--ink);font:12px var(--sans)}
+.account-menu>.create-account{background:var(--gold);color:#fffaf2}.account-name{font:12px var(--sans);color:var(--muted);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.account-dialog{width:min(520px,calc(100vw - 32px));max-height:90dvh;overflow:auto;border:1px solid #d6b577;border-radius:28px;padding:38px;background:#fbf7f0;color:var(--ink);box-shadow:0 28px 90px #1d11194d}
+.account-dialog::backdrop{background:#1b1018a8;backdrop-filter:blur(6px)}.account-dialog h2{font:400 44px/1.05 var(--display);margin:8px 0 12px}.account-dialog>p{line-height:1.6;color:var(--muted)}
+.account-dialog .close{position:absolute;right:18px;top:18px}.account-dialog form,.account-dialog form label{display:flex;flex-direction:column}.account-dialog form{gap:14px}.account-dialog form label{gap:7px;font:600 11px var(--sans);letter-spacing:.04em}
+.account-dialog input{min-height:48px;border:1px solid #d6b577;border-radius:999px;background:#fffdf9;padding:11px 16px;font:16px var(--sans);color:var(--ink)}.name-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.google-login,.auth-submit{width:100%;min-height:48px;border:1px solid #d6b577;border-radius:999px;font:600 13px var(--sans)}.google-login{background:#fffdf9;color:var(--ink)}.auth-submit{background:var(--gold);color:white}.google-login:disabled,.auth-submit:disabled{opacity:.55;cursor:not-allowed}
+.auth-divider{display:flex;align-items:center;gap:12px;margin:18px 0;color:var(--muted);font:11px var(--sans)}.auth-divider:before,.auth-divider:after{content:'';height:1px;background:var(--line);flex:1}.auth-notice,.auth-message{padding:12px 14px;border:1px solid #d6b577;border-radius:16px;background:#f3eadb;font-size:12px}.auth-switch{display:block;margin:18px auto 0;border:0!important;background:transparent!important;color:var(--gold);text-decoration:underline;text-underline-offset:4px}
+@media(max-width:980px){.site-header{flex-wrap:wrap}.account-menu{min-width:0}.account-menu>button{padding:7px 10px;font-size:11px}}
+@media(max-width:600px){.account-menu{width:100%;justify-content:center}.account-dialog{padding:30px 22px}.name-fields{grid-template-columns:1fr}}
+
+/* Readable type scale for an audience that benefits from larger text. */
+body{font-size:17px}
+.site-header nav button,.account-menu>button,.account-name{font-size:14px}
+.header-location,.eyebrow,.section-kicker,.company,.field{font-size:12px}
+.hero .intro,.illustrated-hero .intro{font-size:18px}
+.illustrated-hero .intro{max-width:none;white-space:nowrap}
+.field input,.field select{font-size:16px}
+.text-button,.date-shortcuts button,.segmented button,.details-button,.outline-button,.ticket-button,.empty button,.announcement-grid a,.venue-links a{font-size:14px}
+.filter-chips button,.event-kind,.art-mark{font-size:12px}
+.results-summary,.coverage-brief,.coverage,.sources-updates,.film-credit,.card-performance-date{font-size:14px}
+.card-performance-date span,.venue-line,.verification-note,.check-date,.source-link,.date-list p,.archived-list p{font-size:13px}
+.next-date,.production-facts dd,.announcement-grid p{font-size:15px}
+.company{font-size:11px}.event-kind{font-size:11px}
+.composer{font-size:19px}
+.source-grid strong,.source-grid p,.source-grid small{font-size:13px}
+.footer-note,footer .footer-note{font-size:13px}
+.about-copy p,.venue-bio,.venues-heading>p{font-size:16px}
+.company-list span,.production-facts dt,.venue-profile figcaption,.venue-era{font-size:12px}
+.venues-note{font-size:13px}
+.more-filters summary,.detail-sources summary,.film-credit summary{font-size:14px}
+.account-dialog>p{font-size:16px}
+.account-dialog form label{font-size:13px}
+.google-login,.auth-submit{font-size:15px;min-height:52px}
+.auth-divider{font-size:13px}
+.auth-notice,.auth-message,.auth-switch{font-size:14px}
+@media(max-width:800px){
+ .site-header nav button,.account-menu>button{font-size:13px}
+ .hero .intro{font-size:17px}
+ .illustrated-hero .intro{font-size:clamp(11px,3.1vw,15px);letter-spacing:-.015em}
+ .date-shortcuts button,.segmented button{font-size:13px}
+ .results-summary,.coverage-brief{font-size:14px}
+}
