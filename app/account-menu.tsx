@@ -34,8 +34,6 @@ export default function AccountMenu(){
    <p className="eyebrow">Your OH-pera account</p><h2 id="account-title">{mode==='create'?'Create an account':'Welcome back'}</h2>
    <p>{mode==='create'?'Save your details securely and prepare for account-based favorites.':'Log in to your OH-pera account.'}</p>
    {!configured&&<p className="auth-notice" role="status">Account forms are ready. Add the Supabase URL and publishable key to <code>.env.local</code> to connect the backend.</p>}
-   <button type="button" className="google-login" onClick={google} disabled={busy||!configured}>Continue with Google</button>
-   <div className="auth-divider"><span>or use email</span></div>
    <form onSubmit={submit}>
     {mode==='create'&&<div className="name-fields"><label>First name<input name="firstName" autoComplete="given-name" required/></label><label>Last name<input name="lastName" autoComplete="family-name" required/></label></div>}
     <label>Email address<input name="email" type="email" autoComplete="email" required/></label>
@@ -43,6 +41,8 @@ export default function AccountMenu(){
     {mode==='create'&&<label>Confirm password<input name="confirmPassword" type="password" autoComplete="new-password" minLength={8} required/></label>}
     <button type="submit" className="auth-submit" disabled={busy||!configured}>{busy?'Please wait…':mode==='create'?'Create account':'Log in'}</button>
    </form>
+   <div className="auth-divider"><span>or</span></div>
+   <button type="button" className="google-login" onClick={google} disabled={busy||!configured}>Continue with Google</button>
    {message&&<p className="auth-message" role="status">{message}</p>}
    <button type="button" className="auth-switch" onClick={()=>open(mode==='create'?'login':'create')}>{mode==='create'?'Already have an account? Log in':'New to OH-pera? Create an account'}</button>
   </dialog>
