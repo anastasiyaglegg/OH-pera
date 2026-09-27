@@ -1,5 +1,5 @@
 'use client';
-import type {User} from '@supabase/supabase-js';
+import type {AuthChangeEvent,Session,User} from '@supabase/supabase-js';
 import {useEffect,useRef,useState} from 'react';
 import {getSupabaseBrowserClient,supabaseConfigured} from '../lib/supabase/client';
 
@@ -9,7 +9,7 @@ export default function AccountMenu(){
  const [mode,setMode]=useState<Mode|null>(null),[user,setUser]=useState<User|null>(null),[message,setMessage]=useState(''),[busy,setBusy]=useState(false);
  const dialogRef=useRef<HTMLDialogElement>(null);
  const configured=supabaseConfigured();
- useEffect(()=>{const client=getSupabaseBrowserClient();if(!client)return;void client.auth.getUser().then(({data})=>setUser(data.user));const {data}=client.auth.onAuthStateChange((_event,session)=>setUser(session?.user??null));return()=>data.subscription.unsubscribe();},[]);
+ useEffect(()=>{const client=getSupabaseBrowserClient();if(!client)return;const {data}=client.auth.onAuthStateChange((_event:AuthChangeEvent,session:Session|null)=>setUser(session?.user??null));return()=>data.subscription.unsubscribe();},[]);
  useEffect(()=>{const dialog=dialogRef.current;if(mode&&!dialog?.open)dialog?.showModal();if(!mode&&dialog?.open)dialog.close();},[mode]);
  const open=(next:Mode)=>{setMessage('');setMode(next);};
  const close=()=>{setMode(null);setMessage('');};
@@ -25,9 +25,10 @@ export default function AccountMenu(){
   }
   setBusy(false);
  };
- const signOut=async()=>{setBusy(true);await getSupabaseBrowserClient()?.auth.signOut();setBusy(false);};
+ const signOut=async()=>{setBusy(true);try{const result=await getSupabaseBrowserClient()?.auth.signOut();if(result?.error)setMessage('Sign out failed. Please try again.');}catch{setMessage('Sign out failed. Please try again.');}finally{setBusy(false);}};
  const name=String(user?.user_metadata?.first_name||user?.user_metadata?.full_name||user?.email?.split('@')[0]||'Account');
  return <div className="account-menu" aria-label="Account">
+  {user&&message&&!mode&&<p role="status">{message}</p>}
   {user?<><span className="account-name">Hi, {name}</span><button type="button" onClick={signOut} disabled={busy}>Sign out</button></>:<><button type="button" onClick={()=>open('login')}>Log in</button><button type="button" className="create-account" onClick={()=>open('create')}>Create account</button></>}
   <dialog ref={dialogRef} className="account-dialog" aria-labelledby="account-title" onCancel={event=>{event.preventDefault();close();}}>
    <button type="button" className="close" onClick={close} aria-label="Close account window">×</button>
