@@ -1,5 +1,5 @@
 'use client';
-import {useEffect,useRef,useState} from 'react';
+import {useCallback,useEffect,useRef,useState} from 'react';
 import {getSupabaseBrowserClient} from '../lib/supabase/client';
 import {readSaved} from '../lib/saved';
 import type {Performance} from '../lib/schedule';
@@ -36,13 +36,13 @@ export function useAccountSaves(){
   });
   return()=>{active=false;generation.current++;data.subscription.unsubscribe();};
  },[]);
- const change=async(performance:Performance|null,id?:string)=>{
+ const change=useCallback(async(performance:Performance|null,id?:string)=>{
   const client=getSupabaseBrowserClient(),account=owner.current;
   if(!client||!account){setMessage('Please log in to save performances to your account.');return;}
   if(pending.current||loading)return;
   pending.current=true;const version=generation.current;setMessage('');
   try{
-   const query=performance?client.from('saved_performances').insert({user_id:account,performance_id:performance.id,performance}):id?client.from('saved_performances').delete().eq('user_id',account).eq('performance_id',id):client.from('saved_performances').delete().eq('user_id',account);
+   const query=performance?client.from('saved_performances').upsert({user_id:account,performance_id:performance.id,performance},{onConflict:'user_id,performance_id',ignoreDuplicates:true}):id?client.from('saved_performances').delete().eq('user_id',account).eq('performance_id',id):client.from('saved_performances').delete().eq('user_id',account);
    const {error}=await query;
    if(version!==generation.current)return;
    if(error)throw error;
@@ -51,8 +51,10 @@ export function useAccountSaves(){
     if(!id)return empty();
     const records={...old.records};delete records[id];return {ids:old.ids.filter(key=>key!==id),records};
    });
+   setMessage(performance?'Performance saved.':id?'Performance removed.':'All saved performances cleared.');
   }catch{if(version===generation.current)setMessage('Your saved list could not be updated. Please try again.');}
   finally{if(version===generation.current)pending.current=false;}
- };
- return {favorites:saved.ids,savedRecords:saved.records,userId,loading,message,toggleSave:(p:Performance)=>void change(saved.ids.includes(p.id)?null:p,p.id),removeSaved:(id:string)=>void change(null,id),clearSaved:()=>void change(null)};
+ },[loading]);
+ const savePerformance=useCallback((p:Performance)=>change(p),[change]);
+ return {savePerformance,favorites:saved.ids,savedRecords:saved.records,userId,loading,message,toggleSave:(p:Performance)=>void change(saved.ids.includes(p.id)?null:p,p.id),removeSaved:(id:string)=>void change(null,id),clearSaved:()=>void change(null)};
 }
