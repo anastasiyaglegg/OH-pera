@@ -9,6 +9,14 @@ export default function HeroVideo(){
   const timer=setTimeout(()=>setTimedOut(true),15000);
   return ()=>clearTimeout(timer);
  },[enabled,ready,attempt]);
+ // Respect visitor motion/data preferences before creating the third-party embed.
+ useEffect(()=>{
+  const motion=window.matchMedia('(prefers-reduced-motion: reduce)');
+  const connection=(navigator as Navigator & {connection?:{saveData?:boolean}}).connection;
+  const sync=()=>{setEnabled(!motion.matches&&!connection?.saveData);setReady(false);setMuted(true);setTimedOut(false);};
+  sync();motion.addEventListener('change',sync);
+  return()=>motion.removeEventListener('change',sync);
+ },[]);
  const playerRef=useRef<HTMLIFrameElement>(null);
  const send=(func:string,args:unknown[]=[])=>playerRef.current?.contentWindow?.postMessage(JSON.stringify({event:'command',func,args}),PLAYER_ORIGIN);
  const toggleSound=()=>{if(muted){send('unMute');send('setVolume',[70]);send('playVideo');}else send('mute');setMuted(x=>!x);};
@@ -23,7 +31,7 @@ export default function HeroVideo(){
   <div className="hero-film-tools">
    {enabled&&!ready&&<span role="status">{timedOut?'YouTube is taking longer than expected.':'Loading video…'}</span>}
    {enabled&&<button type="button" className="hero-film-toggle" onClick={retry}>Retry video</button>}
-   {enabled?<><button type="button" className="hero-film-toggle" onClick={toggleSound} disabled={!ready} aria-pressed={!muted} aria-label={muted?'Turn on sound for the Maria Callas video':'Mute the Maria Callas video'}>{muted?'Sound on':'Sound off'}</button><button type="button" className="hero-film-toggle" onClick={stop}>Hide video</button></>:<><button type="button" className="hero-film-toggle" onClick={()=>setEnabled(true)} aria-describedby="video-privacy-note">Play video</button><span id="video-privacy-note">Loads YouTube. <a href="#privacy">Privacy</a></span></>}
+   {enabled?<><button type="button" className="hero-film-toggle" onClick={toggleSound} disabled={!ready} aria-pressed={!muted} aria-label={muted?'Turn on sound for the Maria Callas video':'Mute the Maria Callas video'}>{muted?'Sound on':'Sound off'}</button><button type="button" className="hero-film-toggle" onClick={stop}>Hide video</button></>:<><button type="button" className="hero-film-toggle" onClick={()=>setEnabled(true)} aria-describedby="video-privacy-note">Play video</button><span id="video-privacy-note">Loads YouTube. <a href="/privacy">Privacy</a></span></>}
   </div>
  </>;
 }
