@@ -26,10 +26,11 @@ export default function AccountMenu(){
   setBusy(false);
  };
  const signOut=async()=>{setBusy(true);try{const result=await getSupabaseBrowserClient()?.auth.signOut();if(result?.error)setMessage('Sign out failed. Please try again.');}catch{setMessage('Sign out failed. Please try again.');}finally{setBusy(false);}};
- const name=String(user?.user_metadata?.first_name||user?.user_metadata?.full_name||user?.email?.split('@')[0]||'Account');
+ const nameSource=String(user?.user_metadata?.first_name||user?.user_metadata?.full_name||user?.email?.split('@')[0]||'Account');
+ const firstName=nameSource.split(/\s+/)[0];
  return <div className="account-menu" aria-label="Account">
   {user&&message&&!mode&&<p role="status">{message}</p>}
-  {user?<><span className="account-name">Hi, {name}</span><button type="button" onClick={signOut} disabled={busy}>Sign out</button></>:<><button type="button" onClick={()=>open('login')}>Log in</button><button type="button" className="create-account" onClick={()=>open('create')}>Create account</button></>}
+  {user?<><span className="account-name">Hello, {firstName}!</span><button type="button" onClick={signOut} disabled={busy}>Sign out</button></>:<><button type="button" onClick={()=>open('login')}>Log in</button><button type="button" className="create-account" onClick={()=>open('create')}>Create account</button></>}
   <dialog ref={dialogRef} className="account-dialog" aria-labelledby="account-title" onCancel={event=>{event.preventDefault();close();}}>
    <button type="button" className="close" onClick={close} aria-label="Close account window">×</button>
    <p className="eyebrow">Your OH-pera account</p><h2 id="account-title">{mode==='create'?'Create an account':'Welcome back'}</h2>
