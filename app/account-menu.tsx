@@ -1,20 +1,24 @@
 'use client';
+import {readQueuedSave} from '../lib/pending-save';
 import type {AuthChangeEvent,Session,User} from '@supabase/supabase-js';
 import {useEffect,useRef,useState} from 'react';
 import {getSupabaseBrowserClient,supabaseConfigured} from '../lib/supabase/client';
 
 type Mode='login'|'create';
 
-export default function AccountMenu(){
+export default function AccountMenu({loginRequest=0,onCancelSave}:{loginRequest?:number;onCancelSave:()=>void}){
  const [mode,setMode]=useState<Mode|null>(null),[user,setUser]=useState<User|null>(null),[message,setMessage]=useState(''),[busy,setBusy]=useState(false);
+ const [savingAfterLogin,setSavingAfterLogin]=useState(false);
  const dialogRef=useRef<HTMLDialogElement>(null);
  const configured=supabaseConfigured();
  useEffect(()=>{const client=getSupabaseBrowserClient();if(!client)return;const {data}=client.auth.onAuthStateChange((_event:AuthChangeEvent,session:Session|null)=>setUser(session?.user??null));return()=>data.subscription.unsubscribe();},[]);
  useEffect(()=>{const dialog=dialogRef.current;if(mode&&!dialog?.open)dialog?.showModal();if(!mode&&dialog?.open)dialog.close();},[mode]);
+ // eslint-disable-next-line react-hooks/set-state-in-effect
+ useEffect(()=>{if(loginRequest){setSavingAfterLogin(Boolean(readQueuedSave(window.sessionStorage)));setMessage('');setMode('login');}},[loginRequest]);
  const open=(next:Mode)=>{setMessage('');setMode(next);};
- const close=()=>{setMode(null);setMessage('');};
- const google=async()=>{const client=getSupabaseBrowserClient();if(!client){setMessage('Add your Supabase project keys to enable account access.');return;}setBusy(true);const {error}=await client.auth.signInWithOAuth({provider:'google',options:{redirectTo:`${window.location.origin}/`}});if(error){setMessage(error.message);setBusy(false);}};
- const submit=async(event:React.FormEvent<HTMLFormElement>)=>{event.preventDefault();const client=getSupabaseBrowserClient();if(!client){setMessage('Add your Supabase project keys to enable account access.');return;}const form=new FormData(event.currentTarget),email=String(form.get('email')||''),password=String(form.get('password')||'');setBusy(true);setMessage('');
+ const close=()=>{onCancelSave();setMode(null);setMessage('');};
+ const google=async()=>{const client=getSupabaseBrowserClient();if(!client){setMessage('Account access is temporarily unavailable. Please try again later.');return;}setBusy(true);const {error}=await client.auth.signInWithOAuth({provider:'google',options:{redirectTo:`${window.location.origin}/`}});if(error){setMessage(error.message);setBusy(false);}};
+ const submit=async(event:React.FormEvent<HTMLFormElement>)=>{event.preventDefault();const client=getSupabaseBrowserClient();if(!client){setMessage('Account access is temporarily unavailable. Please try again later.');return;}const form=new FormData(event.currentTarget),email=String(form.get('email')||''),password=String(form.get('password')||'');setBusy(true);setMessage('');
   if(mode==='create'){
    const confirm=String(form.get('confirmPassword')||'');if(password!==confirm){setMessage('Passwords do not match.');setBusy(false);return;}
    const firstName=String(form.get('firstName')||'').trim(),lastName=String(form.get('lastName')||'').trim();
@@ -34,8 +38,8 @@ export default function AccountMenu(){
   <dialog ref={dialogRef} className="account-dialog" aria-labelledby="account-title" onCancel={event=>{event.preventDefault();close();}}>
    <button type="button" className="close" onClick={close} aria-label="Close account window">×</button>
    <p className="eyebrow">Your OH-pera account</p><h2 id="account-title">{mode==='create'?'Create an account':'Welcome back'}</h2>
-   <p>{mode==='create'?'Save your details securely and prepare for account-based favorites.':'Log in to your OH-pera account.'}</p>
-   {!configured&&<p className="auth-notice" role="status">Account forms are ready. Add the Supabase URL and publishable key to <code>.env.local</code> to connect the backend.</p>}
+   <p>{mode==='create'?'Create an account to keep your favorite performances together.':(savingAfterLogin?'Log in to save your selected performance.':'Log in to your OH-pera account.')}</p>
+   {!configured&&<p className="auth-notice" role="status">Account access is temporarily unavailable. You can still explore performances and ticket links.</p>}
    <form onSubmit={submit}>
     {mode==='create'&&<div className="name-fields"><label>First name<input name="firstName" autoComplete="given-name" required/></label><label>Last name<input name="lastName" autoComplete="family-name" required/></label></div>}
     <label>Email address<input name="email" type="email" autoComplete="email" required/></label>

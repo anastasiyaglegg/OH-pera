@@ -30,7 +30,7 @@ export default function HeroVideo(){
   </div>
   <div className="hero-film-tools">
    {enabled&&!ready&&<span role="status">{timedOut?'YouTube is taking longer than expected.':'Loading video…'}</span>}
-   {enabled&&<button type="button" className="hero-film-toggle" onClick={retry}>Retry video</button>}
+   {enabled&&timedOut&&!ready&&<button type="button" className="hero-film-toggle" onClick={retry}>Retry video</button>}
    {enabled?<><button type="button" className="hero-film-toggle" onClick={toggleSound} disabled={!ready} aria-pressed={!muted} aria-label={muted?'Turn on sound for the Maria Callas video':'Mute the Maria Callas video'}>{muted?'Sound on':'Sound off'}</button><button type="button" className="hero-film-toggle" onClick={stop}>Hide video</button></>:<><button type="button" className="hero-film-toggle" onClick={()=>setEnabled(true)} aria-describedby="video-privacy-note">Play video</button><span id="video-privacy-note">Loads YouTube. <a href="/privacy">Privacy</a></span></>}
   </div>
  </>;
