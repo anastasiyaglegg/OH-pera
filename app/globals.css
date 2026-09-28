@@ -257,3 +257,6 @@ body{font-size:17px}
  .date-shortcuts button,.segmented button{font-size:13px}
  .results-summary,.coverage-brief{font-size:14px}
 }
+.site-header .singer-wordmark{position:relative;display:block;width:240px;height:82px;min-width:0;overflow:hidden;justify-self:start}
+.singer-wordmark img{position:absolute;display:block;width:280px;max-width:none;height:auto;left:-20px;top:-22px}
+@media(max-width:800px){.site-header .singer-wordmark{width:240px;height:82px;flex:0 0 240px}}
