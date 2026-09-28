@@ -19,7 +19,7 @@ export default function AccountMenu(){
    const confirm=String(form.get('confirmPassword')||'');if(password!==confirm){setMessage('Passwords do not match.');setBusy(false);return;}
    const firstName=String(form.get('firstName')||'').trim(),lastName=String(form.get('lastName')||'').trim();
    const {data,error}=await client.auth.signUp({email,password,options:{data:{first_name:firstName,last_name:lastName,full_name:`${firstName} ${lastName}`.trim()},emailRedirectTo:`${window.location.origin}/`}});
-   if(error)setMessage(error.message);else if(data.session){setMessage('Account created. You are signed in.');setMode(null);}else setMessage('Check your email to confirm your account.');
+   if(error)setMessage(error.message);else if(data.session){setMessage('Account created. You are signed in.');setMode(null);}else{setMessage('Check your email to confirm your account, then log in below.');setMode('login');}
   }else{
    const {error}=await client.auth.signInWithPassword({email,password});if(error)setMessage(error.message);else setMode(null);
   }
