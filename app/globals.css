@@ -347,3 +347,25 @@ footer .film-credit p,footer .sources-updates>p{font:13px/1.8 var(--sans);color:
  .performance-list .production-body h3{font-size:27px}
  .performance-list .composer{font-size:17px}
 }
+
+/* Keep video controls in the content flow, including wrapped failure messages. */
+.illustrated-hero:has(.callas-film){padding:40px 7vw 48px;min-height:clamp(620px,82svh,900px);justify-content:center}
+.hero-film-tools{position:relative;inset:auto;flex:none;max-width:100%;width:100%;margin:0 0 32px;gap:10px;align-items:center;font:14px/1.5 var(--sans)}
+.hero-film-status{flex-basis:100%;color:#fff9ef;max-width:46ch}
+.hero-film-tools .hero-film-toggle{min-height:44px;padding:10px 16px;font-size:14px;line-height:1.4;color:#f2d9b7;background:#17121bb3;text-decoration:none;text-align:center}
+.hero-film-tools a.hero-film-toggle{display:inline-flex}
+.illustrated-hero .hero-explore{position:relative;inset:auto;margin-top:40px;max-width:100%}
+.callas-film iframe{top:50%;left:50%;width:max(133.334cqw,177.778cqh);height:max(100cqh,75cqw);transform:translate(-50%,-50%)}
+@media(max-width:800px){
+ .illustrated-hero:has(.callas-film){padding:28px 24px 36px;min-height:560px}
+ .hero-film-tools{margin-bottom:28px}
+ .illustrated-hero:has(.callas-film) h1{font-size:clamp(38px,10vw,62px)}
+ .illustrated-hero .eyebrow{white-space:normal;overflow-wrap:anywhere}
+ .site-header nav{flex-wrap:wrap}
+ .site-header nav button{flex:1 1 auto}
+ .illustrated-hero .hero-explore{margin-top:32px}
+}
+@media(max-width:360px){
+ .site-header nav button{flex-basis:calc(50% - 6px)}
+ .hero-film-tools .hero-film-toggle{padding:9px 12px;font-size:13px}
+}
