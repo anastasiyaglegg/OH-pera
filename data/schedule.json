@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-28T23:14:38.618Z",
+  "generatedAt": "2026-09-29T05:40:17.664Z",
   "timezone": "America/New_York",
   "coverage": "Five configured organizations; incomplete citywide coverage.",
   "performances": [
@@ -139,7 +139,7 @@
       "status": "scheduled",
       "palette": "olive",
       "label": "OPERA SCREENING",
-      "checkedAt": "2026-09-28T23:14:38.618Z",
+      "checkedAt": "2026-09-29T05:40:17.664Z",
       "title": "Così fan tutte",
       "date": "2026-10-03",
       "time": "13:00",
@@ -497,7 +497,7 @@
       "status": "scheduled",
       "palette": "olive",
       "label": "OPERA SCREENING",
-      "checkedAt": "2026-09-28T23:14:38.618Z",
+      "checkedAt": "2026-09-29T05:40:17.664Z",
       "title": "Macbeth",
       "date": "2026-10-17",
       "time": "13:00",
@@ -1221,7 +1221,7 @@
       "status": "scheduled",
       "palette": "olive",
       "label": "OPERA SCREENING",
-      "checkedAt": "2026-09-28T23:14:38.618Z",
+      "checkedAt": "2026-09-29T05:40:17.664Z",
       "title": "Samson et Dalila",
       "date": "2026-12-05",
       "time": "12:00",
@@ -1299,7 +1299,7 @@
       "status": "scheduled",
       "palette": "olive",
       "label": "OPERA SCREENING",
-      "checkedAt": "2026-09-28T23:14:38.618Z",
+      "checkedAt": "2026-09-29T05:40:17.664Z",
       "title": "La Fanciulla del West",
       "date": "2027-01-23",
       "time": "13:00",
@@ -1321,7 +1321,7 @@
       "status": "scheduled",
       "palette": "olive",
       "label": "OPERA SCREENING",
-      "checkedAt": "2026-09-28T23:14:38.618Z",
+      "checkedAt": "2026-09-29T05:40:17.664Z",
       "title": "Silent Night",
       "date": "2027-03-20",
       "time": "13:00",
@@ -1343,7 +1343,7 @@
       "status": "scheduled",
       "palette": "olive",
       "label": "OPERA SCREENING",
-      "checkedAt": "2026-09-28T23:14:38.618Z",
+      "checkedAt": "2026-09-29T05:40:17.664Z",
       "title": "Manon",
       "date": "2027-04-03",
       "time": "12:00",
@@ -1365,7 +1365,7 @@
       "status": "scheduled",
       "palette": "olive",
       "label": "OPERA SCREENING",
-      "checkedAt": "2026-09-28T23:14:38.618Z",
+      "checkedAt": "2026-09-29T05:40:17.664Z",
       "title": "Otello",
       "date": "2027-04-24",
       "time": "13:00",
@@ -1387,7 +1387,7 @@
       "status": "scheduled",
       "palette": "olive",
       "label": "OPERA SCREENING",
-      "checkedAt": "2026-09-28T23:14:38.618Z",
+      "checkedAt": "2026-09-29T05:40:17.664Z",
       "title": "Parsifal",
       "date": "2027-06-05",
       "time": "12:00",
@@ -1403,7 +1403,7 @@
       "title": "Imaginative programs",
       "dateText": "New York City | 2026",
       "sourceUrl": "https://www.nycopera.com/events#e3",
-      "checkedAt": "2026-09-28T23:14:38.618Z",
+      "checkedAt": "2026-09-29T05:40:17.664Z",
       "note": "An exact NYC performance date or venue has not yet been verified."
     },
     {
@@ -1413,7 +1413,7 @@
       "title": "Dynamic concerts",
       "dateText": "New York City | 2026",
       "sourceUrl": "https://www.nycopera.com/events#e2",
-      "checkedAt": "2026-09-28T23:14:38.618Z",
+      "checkedAt": "2026-09-29T05:40:17.664Z",
       "note": "An exact NYC performance date or venue has not yet been verified."
     },
     {
@@ -1423,7 +1423,7 @@
       "title": "Open-air performance",
       "dateText": "New York City | 2026",
       "sourceUrl": "https://www.nycopera.com/events#e1",
-      "checkedAt": "2026-09-28T23:14:38.618Z",
+      "checkedAt": "2026-09-29T05:40:17.664Z",
       "note": "An exact NYC performance date or venue has not yet been verified."
     },
     {
@@ -1434,7 +1434,7 @@
       "dateText": "October 22-31, 2026 | Judson Memorial Church",
       "sourceUrl": "https://www.heartbeatopera.org/queeneytodd",
       "ticketUrl": null,
-      "checkedAt": "2026-09-28T23:14:38.618Z",
+      "checkedAt": "2026-09-29T05:40:17.664Z",
       "note": "Season run announced. Individual performance dates and times are not yet verified."
     },
     {
@@ -1445,7 +1445,7 @@
       "dateText": "February 16-28, 2027 | The Space at Irondale",
       "sourceUrl": "https://www.heartbeatopera.org/2627season",
       "ticketUrl": null,
-      "checkedAt": "2026-09-28T23:14:38.618Z",
+      "checkedAt": "2026-09-29T05:40:17.664Z",
       "note": "Season run announced. Individual performance dates and times are not yet verified."
     },
     {
@@ -1456,7 +1456,7 @@
       "dateText": "MAY 6-22, 2027 | BARUCH PERFORMING ARTS CENTER",
       "sourceUrl": "https://www.heartbeatopera.org/2627season",
       "ticketUrl": null,
-      "checkedAt": "2026-09-28T23:14:38.618Z",
+      "checkedAt": "2026-09-29T05:40:17.664Z",
       "note": "Season run announced. Individual performance dates and times are not yet verified."
     },
     {
@@ -1466,7 +1466,7 @@
       "title": "THE TALES OF HOFFMANN",
       "dateText": "February 11th, 13th & 14th",
       "sourceUrl": "https://bronxopera.org/this-season/",
-      "checkedAt": "2026-09-28T23:14:38.618Z",
+      "checkedAt": "2026-09-29T05:40:17.664Z",
       "note": "The source does not confirm a year and performance time. These dates are not shown as bookable performances."
     },
     {
@@ -1476,7 +1476,7 @@
       "title": "THE COUNT OF MONTE CRISTO",
       "dateText": "May 6th, 8th & 9th",
       "sourceUrl": "https://bronxopera.org/this-season/",
-      "checkedAt": "2026-09-28T23:14:38.618Z",
+      "checkedAt": "2026-09-29T05:40:17.664Z",
       "note": "The source does not confirm a year and performance time. These dates are not shown as bookable performances."
     }
   ],
@@ -1486,7 +1486,7 @@
       "name": "Metropolitan Opera",
       "url": "https://www.metopera.org/Calendar/",
       "palette": "plum",
-      "lastAttemptAt": "2026-09-28T23:14:38.618Z",
+      "lastAttemptAt": "2026-09-29T05:40:17.664Z",
       "lastSuccessAt": "2026-08-10T03:03:04.062Z",
       "status": "fallback",
       "message": "Source returned HTTP 403. Using a secondary snapshot with its original verification date."
@@ -1496,8 +1496,8 @@
       "name": "New York City Opera",
       "url": "https://www.nycopera.com/events",
       "palette": "blue",
-      "lastAttemptAt": "2026-09-28T23:14:38.618Z",
-      "lastSuccessAt": "2026-09-28T23:14:38.618Z",
+      "lastAttemptAt": "2026-09-29T05:40:17.664Z",
+      "lastSuccessAt": "2026-09-29T05:40:17.664Z",
       "status": "partial",
       "message": "Some announced programs do not yet have confirmed dates. Overseas performances are excluded."
     },
@@ -1506,8 +1506,8 @@
       "name": "Heartbeat Opera",
       "url": "https://www.heartbeatopera.org/",
       "palette": "amber",
-      "lastAttemptAt": "2026-09-28T23:14:38.618Z",
-      "lastSuccessAt": "2026-09-28T23:14:38.618Z",
+      "lastAttemptAt": "2026-09-29T05:40:17.664Z",
+      "lastSuccessAt": "2026-09-29T05:40:17.664Z",
       "status": "partial",
       "message": "Season announcements verified; individual performance sessions still require the ticketing feed."
     },
@@ -1516,8 +1516,8 @@
       "name": "Bronx Opera",
       "url": "https://bronxopera.org/this-season/",
       "palette": "coral",
-      "lastAttemptAt": "2026-09-28T23:14:38.618Z",
-      "lastSuccessAt": "2026-09-28T23:14:38.618Z",
+      "lastAttemptAt": "2026-09-29T05:40:17.664Z",
+      "lastSuccessAt": "2026-09-29T05:40:17.664Z",
       "status": "partial",
       "message": "Season announcements found, but year, times and venue need confirmation."
     },
@@ -1526,8 +1526,8 @@
       "name": "BAM",
       "url": "https://www.bam.org/",
       "palette": "olive",
-      "lastAttemptAt": "2026-09-28T23:14:38.618Z",
-      "lastSuccessAt": "2026-09-28T23:14:38.618Z",
+      "lastAttemptAt": "2026-09-29T05:40:17.664Z",
+      "lastSuccessAt": "2026-09-29T05:40:17.664Z",
       "status": "partial",
       "message": "Opera listings and HD screenings checked. Screenings are labeled separately; full live-stage coverage is not yet guaranteed."
     }
