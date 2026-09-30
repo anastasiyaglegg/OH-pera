@@ -459,10 +459,10 @@ footer .film-credit p,footer .sources-updates>p{font:13px/1.8 var(--sans);color:
 /* Frosted landing navigation with the hero artwork visible underneath. */
 .club-original-landing{--landing-header-height:106px}
 .club-app.club-original-landing .site-header.club-header{height:var(--landing-header-height);min-height:var(--landing-header-height);background:rgba(247,244,239,.68);border-bottom:1px solid rgba(255,255,255,.42);box-shadow:0 1px 12px #251c2008;backdrop-filter:blur(22px) saturate(125%);-webkit-backdrop-filter:blur(22px) saturate(125%)}
-.club-original-landing .club-main{margin-top:calc(-1 * var(--landing-header-height))}
-.club-original-landing .club-original-hero.illustrated-hero{padding-top:calc(64px + var(--landing-header-height));min-height:calc(clamp(620px,82svh,900px) + var(--landing-header-height))}
+.club-original-landing .club-main{margin-top:16px}
+.club-original-landing .club-original-hero.illustrated-hero{padding-top:64px;min-height:clamp(620px,82svh,900px)}
 .club-original-landing .club-account>button{background:rgba(255,253,249,.55)}
-@media(max-width:600px){.club-original-landing{--landing-header-height:82px}.club-original-landing .club-original-hero.illustrated-hero{padding-top:calc(48px + var(--landing-header-height));min-height:calc(560px + var(--landing-header-height))}}
+@media(max-width:600px){.club-original-landing{--landing-header-height:82px}.club-original-landing .club-original-hero.illustrated-hero{padding-top:48px;min-height:560px}}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.club-app.club-original-landing .site-header.club-header{background:rgba(247,244,239,.95)}}
 
 /* Rounded frosted menu bar. */
@@ -471,8 +471,8 @@ footer .film-credit p,footer .sources-updates>p{font:13px/1.8 var(--sans);color:
 
 /* Float the menu slightly inside the viewport so all four curves are visible. */
 .club-app.club-original-landing .site-header.club-header{top:10px;margin:10px 12px 0;border-radius:28px}
-.club-original-landing .club-main{margin-top:calc(-1 * (var(--landing-header-height) + 10px))}
-@media(max-width:600px){.club-app.club-original-landing .site-header.club-header{top:8px;margin:8px 10px 0;border-radius:24px;padding-inline:14px}.club-original-landing .club-main{margin-top:calc(-1 * (var(--landing-header-height) + 8px))}}
+.club-original-landing .club-main{margin-top:16px}
+@media(max-width:600px){.club-app.club-original-landing .site-header.club-header{top:8px;margin:8px 10px 0;border-radius:24px;padding-inline:14px}.club-original-landing .club-main{margin-top:16px}}
 
 /* Let member performance cards use the available viewport, including wide screens. */
 .club-main:has(.club-evenings){max-width:none;width:100%;padding-inline:clamp(12px,2vw,32px)}
@@ -575,16 +575,16 @@ footer .film-credit p,footer .sources-updates>p{font:13px/1.8 var(--sans);color:
 .club-anonymous-attendees small{display:block;margin-top:4px;font-size:11px;color:var(--muted)}
 
 /* Architectural sketch becomes quiet page scenery rather than a header thumbnail. */
-.club-app:has(.club-discover-page){position:relative;isolation:isolate}
-.club-app:has(.club-discover-page)::before{
+.club-app{position:relative;isolation:isolate}
+.club-app::before{
  content:'';
- position:absolute;
+ position:fixed;
  z-index:-1;
  top:110px;
  right:0;
- width:min(78vw,1200px);
- height:760px;
- background:url('/images/venues/met-pencil.png') right top / contain no-repeat;
+ width:100%;
+ height:calc(100dvh - 110px);
+ background:url('/images/venues/met-pencil.png') right center / cover no-repeat;
  opacity:.13;
  mix-blend-mode:multiply;
  pointer-events:none;
@@ -596,7 +596,7 @@ footer .film-credit p,footer .sources-updates>p{font:13px/1.8 var(--sans);color:
 .club-calendar-welcome{display:block;padding-top:44px;padding-bottom:20px}
 .club-calendar-welcome>div{max-width:980px}
 @media(max-width:600px){
- .club-app:has(.club-discover-page)::before{top:160px;width:100%;height:500px;opacity:.09;background-size:620px auto;background-position:35% top}
+ .club-app::before{top:140px;width:100%;height:calc(100dvh - 140px);opacity:.09;background-size:cover;background-position:60% center}
  .club-calendar-welcome{padding-top:30px;padding-bottom:12px}
 }
 
@@ -948,3 +948,164 @@ footer .film-credit p,footer .sources-updates>p{font:13px/1.8 var(--sans);color:
 .club-member-options button{width:100%;min-height:44px;text-align:left;padding:10px 14px}
 .club-remove-confirmation{padding-top:12px}
 @media(max-width:450px){.club-invitee-row{gap:10px}.club-member-management-panel{padding:16px}}
+
+.club-profile-editor{max-width:1100px;margin:0 auto 48px;font:400 14px/1.6 var(--font-geist-sans),Arial,sans-serif}
+.club-profile-fields{padding:0;border:0;margin:0;min-width:0}
+.club-profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.club-profile-panel{padding:28px;border:1px solid #d8c7a97a;border-radius:26px;background:#fffdf9b3;margin-bottom:24px;min-width:0}
+.club-profile-panel h2{font:400 28px/1.2 var(--display);margin:0 0 14px}
+.club-profile-panel p{color:#6c6065}
+.club-profile-panel label{display:block;margin:18px 0 0;font:500 14px/20px var(--sans);color:#53474d}
+.club-profile-name-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.club-profile-panel input:not([type=checkbox]),.club-profile-panel select,.club-profile-panel textarea{display:block;width:100%;min-width:0;box-sizing:border-box;margin-top:8px;border:1px solid #d4af67;border-radius:22px;background:#fffdf9;padding:12px 16px;color:#30252a;font:var(--field-font);min-height:48px}
+.club-profile-panel input[readonly]{background:#f0ebe3;color:#6c6065}
+.club-profile-panel .club-fine-print{font-size:12px;margin:8px 0 16px}
+.club-private-label{font-weight:400;font-size:11px;color:#756650;margin-left:8px}
+.club-profile-photos{display:flex;gap:12px;flex-wrap:wrap;margin:22px 0}
+.club-profile-photo{width:calc((100% - 24px)/3);min-width:100px}
+.club-profile-photo>img{width:100%;height:auto;aspect-ratio:1;object-fit:cover;border-radius:20px}
+.club-profile-photo:first-child>img{border-radius:50%}
+.club-profile-photo>span{display:block;font-size:11px;color:#7b601e;margin:4px 0}
+.club-profile-photo>div{display:flex;gap:4px;flex-wrap:wrap}
+.club-profile-photo button{padding:6px 9px;min-height:36px;font-size:11px}
+.club-profile-photo-placeholder{width:100px;height:100px;border-radius:50%;display:grid;place-items:center;background:#eaddc1;color:#856316;font:400 44px var(--display)}
+.club-profile-panel .club-photo-upload{font-weight:500}
+.club-photo-upload input::file-selector-button{border:1px solid #c8a454;border-radius:999px;background:#fffdf9;padding:8px 14px;color:#856316;cursor:pointer;margin-right:12px}
+.club-interest-choices{display:flex;gap:12px;flex-wrap:wrap}
+.club-interest-choices label{display:flex;align-items:center;gap:10px;margin:0;border:1px solid #d4af67;border-radius:999px;padding:12px 18px;background:#fffdf9;font-weight:400;cursor:pointer}
+.club-interest-choices input{width:17px;height:17px;accent-color:#856316}
+.club-interest-choices .is-selected{background:#f1e3c5;color:#735412;border-color:#a8802b}
+.club-profile-save{display:flex;gap:20px;align-items:center}.club-profile-save span{color:#756650;font-size:12px}
+.club-profile-demo-note{font-size:12px;color:#756650;margin:0 0 24px}
+.club-public-interests{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px}.club-public-interests span{border:1px solid #d4af67;border-radius:999px;padding:8px 14px;color:#856316;font-size:13px}
+.club-friend-profile .club-avatar img{width:100%;height:100%;border-radius:50%;object-fit:cover}
+.club-public-photos{display:flex;gap:12px;margin-bottom:24px}.club-public-photos img{width:calc(50% - 6px);height:auto;aspect-ratio:1;object-fit:cover;border-radius:20px}
+@media(max-width:700px){.club-profile-grid{grid-template-columns:1fr;gap:0}.club-profile-panel{padding:20px}.club-profile-name-row{grid-template-columns:1fr;gap:0}.club-interest-choices{gap:8px}.club-interest-choices label{padding:10px 14px}.club-profile-panel h2{font-size:25px}}
+
+.club-profile-editor>form{max-width:none;width:100%}.club-profile-editor .club-interest-choices label{display:flex;flex-direction:row}.club-profile-editor .club-interest-choices input{margin:0;flex-shrink:0}
+
+/* Shared field system: landing/auth, Calendar, profiles, invitations and chat.
+   Keep visual tokens here; page rules should control layout only. */
+:root{
+ --field-height:48px;
+ --field-radius:24px;
+ --field-border:#d6b577;
+ --field-surface:#fffdf9;
+ --field-ink:#30252a;
+ --field-muted:#786d70;
+ --field-focus:#806019;
+ --field-font:400 14px/24px var(--sans);
+}
+:root body :is(input:not(:is([type=checkbox],[type=radio],[type=range],[type=hidden],[type=submit],[type=button],[type=color])),select,textarea,button.club-filter-trigger){
+ box-sizing:border-box;
+ width:100%;min-width:0;
+ height:var(--field-height);min-height:var(--field-height);
+ margin:0;padding:11px 16px;
+ border:1px solid var(--field-border);
+ border-radius:var(--field-radius);
+ background-color:var(--field-surface);
+ color:var(--field-ink);
+ font:var(--field-font);letter-spacing:normal;
+ box-shadow:inset 0 1px 0 #fff;
+ transition:border-color .15s,box-shadow .15s;
+}
+:root body :is(select,button.club-filter-trigger){text-align:left;cursor:pointer}
+:root body select:not([hidden]){
+ appearance:none;-webkit-appearance:none;
+ padding-right:44px;
+ background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath d='m4 6 4 4 4-4' fill='none' stroke='%23806019' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+ background-repeat:no-repeat;background-size:16px;background-position:right 16px center;
+}
+:root body textarea:not([hidden]){height:auto;min-height:120px;resize:vertical}
+:root body :is(input,textarea)::placeholder{font:var(--field-font);letter-spacing:normal;color:var(--field-muted);opacity:1}
+:root body :is(input,select,textarea,button.club-filter-trigger):focus-visible{
+ outline:2px solid var(--field-focus);outline-offset:3px;
+ border-color:var(--field-focus);box-shadow:none;
+}
+:root body :is(input,select,textarea,button.club-filter-trigger):disabled{
+ background-color:#eee9e0;color:#786d70;border-color:#d1c4ab;opacity:1;cursor:not-allowed;box-shadow:none;
+}
+:root body :is(input,textarea)[readonly]{background-color:#f1ece4;color:#655b60}
+:root body :is(input,select,textarea)[aria-invalid=true]{border-color:#9a3545}
+:root body input[type=file]{height:auto;min-height:var(--field-height);padding:6px 10px;font-size:14px}
+:root body input[type=file]::file-selector-button{
+ min-height:34px;margin:0 12px 0 0;padding:5px 14px;
+ border:1px solid var(--field-border);border-radius:999px;
+ background:var(--field-surface);color:var(--field-focus);font:400 14px/22px var(--sans);cursor:pointer;
+}
+:root body input:is([type=checkbox],[type=radio]){
+ appearance:auto;-webkit-appearance:auto;
+ width:18px;height:18px;min-width:18px;min-height:18px;
+ padding:0;margin:0;box-shadow:none;accent-color:var(--field-focus);flex-shrink:0;
+}
+:root body .club-app :is(.club-filter-label,.club-discovery-filters>label){font:500 14px/20px var(--sans);letter-spacing:normal;color:#53474d}
+:root body .club-app .club-filter-options button{font:var(--field-font);min-height:44px}
+.club-profile-panel .club-filter-select{margin-top:18px}
+.club-profile-panel .club-filter-label{font:500 14px/20px var(--sans);color:var(--ink)}
+@media(prefers-reduced-motion:reduce){:root body :is(input,select,textarea,button.club-filter-trigger){transition:none}}
+
+/* Custom dropdown text must inherit the same typography as native fields. */
+:root body .club-filter-trigger>span:first-child,
+:root body .club-filter-options button>span{font:inherit;letter-spacing:inherit}
+
+:root body .club-filter-trigger>span[data-placeholder=true]{font:var(--field-font);letter-spacing:normal;color:var(--field-muted)}
+
+/* Shared header geometry for landing, login and every member page. */
+.club-app.club-original-landing{--landing-header-height:72px}
+.club-app .site-header.club-header.club-unified-header{
+ top:10px;margin:10px 16px 0;padding:8px 24px;
+ height:auto;min-height:72px;gap:12px;flex-wrap:wrap;
+ border:1px solid rgba(255,255,255,.48);border-radius:28px;
+ background:var(--club-menu-surface);box-shadow:0 3px 18px #251c2010,inset 0 1px 0 #ffffff70;
+ backdrop-filter:var(--club-menu-blur);-webkit-backdrop-filter:var(--club-menu-blur);
+}
+.club-app .club-header.club-unified-header :is(.club-brand,.club-demo-logo){width:160px;height:52px;flex-shrink:0}
+.club-app .club-header.club-unified-header :is(.club-brand img,.club-demo-logo){height:52px;object-fit:contain}
+.club-app .club-header.club-unified-header :is(nav,.club-account){
+ display:flex;align-items:center;justify-content:flex-end;gap:8px;
+ flex-wrap:wrap;flex:0 1 auto;order:0;width:auto;margin:0;padding:0;border:0;background:transparent;box-shadow:none;
+}
+.club-app .club-header.club-unified-header nav{margin-left:auto}
+.club-app .club-header.club-unified-header .club-account:only-of-type{margin-left:auto}
+.club-app .club-header.club-unified-header button{
+ flex:0 0 auto;min-width:0;min-height:44px;padding:9px 18px;
+ border:1px solid #d6b577;border-radius:999px;background:rgba(255,253,249,.12);
+ color:var(--ink);font:400 14px/24px var(--sans);letter-spacing:normal;
+ box-shadow:inset 0 1px 0 #ffffff60;
+}
+.club-app .club-header.club-unified-header button:hover{background:rgba(255,255,255,.65);border-color:#b89960}
+.club-app .club-header.club-unified-header button[aria-current=page]{background:#806019;color:#fffdf9;border-color:#806019}
+@media(max-width:600px){
+ .club-app.club-original-landing{--landing-header-height:64px}
+ .club-app .site-header.club-header.club-unified-header{top:8px;margin:8px 10px 0;padding:8px 12px;min-height:64px;border-radius:24px;gap:8px;flex-wrap:wrap}
+ .club-app .club-header.club-unified-header :is(.club-brand,.club-demo-logo){width:120px;height:44px}
+ .club-app .club-header.club-unified-header .club-brand img{height:44px}
+ .club-app .club-header.club-unified-header nav{width:100%;justify-content:flex-start;gap:6px}
+ .club-app .club-header.club-unified-header button{padding:9px 12px;font-size:14px}
+}
+
+/* Keep the preview chrome from shifting the shared menu between auth states. */
+.club-app .club-demo-banner{min-height:68px;box-sizing:border-box}
+@media(max-width:700px){.club-app .club-demo-banner{min-height:86px}}
+
+/* Circular member portraits with a discreet meeting-interest badge. */
+.club-app .club-orbiting-circle .club-friend-bubble{position:relative;padding:0;overflow:visible}
+.club-circle-portrait{display:grid;place-items:center;width:100%;height:100%;border-radius:50%;overflow:hidden}
+.club-circle-photo{display:block;width:100%;height:100%;object-fit:cover;border-radius:50%}
+.club-friend-bubble .club-circle-name{position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:7px;max-width:110px;padding:2px 7px;border-radius:10px;background:#fffdf9e6;color:#453529;font:400 12px/18px var(--sans)}
+.club-circle-you>span{position:relative}
+.club-circle-interest{position:absolute;right:-3px;bottom:-3px;display:grid;place-items:center;width:26px;height:26px;border:1px solid #c8a454;border-radius:50%;background:#fffdf9;color:#806019;box-shadow:0 2px 6px #45352918}
+.club-circle-interest svg{width:16px;height:16px}
+.club-circle-interest-more{position:absolute;left:19px;top:-5px;min-width:17px;border:1px solid #d6b577;border-radius:999px;padding:0 3px;background:#fffdf9;font:500 9px/15px var(--sans)}
+.club-circle-you small{margin-top:14px}
+.club-friend-popover .club-circle-interests{font-size:12px;line-height:1.5;color:#806019}
+
+/* Reversible UX trial: compact inbox and navigation confirmation. */
+.club-conversations-entry { margin: 12px 0 24px; }
+#club-conversation-list { display: grid; gap: 10px; margin-top: 12px; max-width: 650px; }
+#club-conversation-list > button { display: flex; justify-content: space-between; gap: 16px; text-align: left; }
+#club-conversation-list > button span { font-size: 13px; color: var(--muted, #71666a); }
+#selected-opera-circle { scroll-margin-top: 110px; }
+.club-leave-dialog { padding: 28px; max-width: min(560px, calc(100vw - 32px)); }
+.club-leave-dialog h2 { font-size: 30px; margin: 0 0 12px; }
+.club-leave-dialog .club-actions { flex-wrap: wrap; margin-top: 20px; }
