@@ -77,3 +77,11 @@ Launch dependency remains: connect the correct OH-pera Supabase project, then ve
 The public landing page now has one theatrical hero with OH-pera artwork and a single invitation action. The club and invitation instructions open in accessible dialogs; direct invitation links open the joining panel. Privacy remains a dedicated page. Member screens and a fictional local demo are included for integration review.
 
 This branch is a draft integration handoff, not a launch-ready replacement for production. Backend owner: Anastasiya. Frontend owner: Ivaylo. Before merge, review all three migrations, provision staging, implement password recovery and validate real account/invitation flows. Do not apply migrations to Pulse Studio. No environment files or keys are part of the PR.
+
+## Member profile follow-up — September 30
+
+After the three club migrations, apply `20260930160509_member_profiles.sql` on staging after review. The editor uses owner-only `profile_get` / `profile_save`; friend dialogs use `profile_view`, which checks active membership, allowed connections and reciprocal blocks. Email comes from Auth and is not changed through the profile RPC. DOB and optional gender never enter the friend projection. Server validation enforces 18+, valid names, allowed interests and bounded photos.
+
+The prototype stores up to three resized JPEG thumbnails in a private profile row (90,000 characters per photo maximum), returned only through the authorized profile RPC. It does not create public photo URLs. The browser resizes and re-encodes JPEG/PNG/WebP input before saving, discarding original file metadata. Move full-resolution galleries to private Supabase Storage with equivalent access policies before expanding beyond this small prototype. No remote migration, photo upload or real account changes have been performed by this work.
+
+Local testing: use My profile in the tester menu, complete fictional first/last name and DOB, choose multiple interests, upload demo artwork, save, then return to verify persistence. A connected member sees the name, bio, interests and photos, without email, DOB or gender. Prototype data resets when the preview process restarts.

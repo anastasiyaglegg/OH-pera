@@ -10,5 +10,5 @@ export default function ClubHeader({children}:{children:ReactNode}){
   window.addEventListener('scroll',update,{passive:true});
   return()=>{cancelAnimationFrame(frame);window.removeEventListener('scroll',update);};
  },[]);
- return <header className={`site-header club-header${scrolled?' is-scrolled':''}`}>{children}</header>;
+ return <header className={`site-header club-header club-unified-header${scrolled?' is-scrolled':''}`}>{children}</header>;
 }

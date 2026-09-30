@@ -1,7 +1,7 @@
 'use client';
 import {useEffect,useId,useRef,useState} from 'react';
 
-type Option={value:string;label:string};
+type Option={value:string;label:string;placeholder?:boolean};
 export default function ClubFilterSelect({label,value,options,onChange}:{label:string;value:string;options:Option[];onChange:(value:string)=>void}){
  const id=useId(),root=useRef<HTMLDivElement>(null),trigger=useRef<HTMLButtonElement>(null),list=useRef<HTMLDivElement>(null);
  const [open,setOpen]=useState(false);
@@ -18,7 +18,7 @@ export default function ClubFilterSelect({label,value,options,onChange}:{label:s
  return <div className={`club-filter-select${open?' is-open':''}`} ref={root} onBlur={event=>{if(!event.currentTarget.contains(event.relatedTarget))setOpen(false);}}>
   <span id={`${id}-label`} className="club-filter-label">{label}</span>
   <button ref={trigger} type="button" className="club-filter-trigger" aria-labelledby={`${id}-label ${id}-value`} aria-haspopup="listbox" aria-expanded={open} aria-controls={`${id}-options`} onClick={()=>setOpen(current=>!current)} onKeyDown={event=>{if(event.key==='ArrowDown'||event.key==='ArrowUp'){event.preventDefault();setOpen(true);}}}>
-   <span id={`${id}-value`}>{selected?.label}</span><span className="club-filter-chevron" aria-hidden="true"/>
+   <span id={`${id}-value`} data-placeholder={selected?.placeholder||undefined}>{selected?.label}</span><span className="club-filter-chevron" aria-hidden="true"/>
   </button>
   {open&&<div id={`${id}-options`} ref={list} role="listbox" aria-labelledby={`${id}-label`} className="club-filter-options" onKeyDown={event=>{
    const buttons=Array.from(list.current?.querySelectorAll<HTMLButtonElement>('[role="option"]')||[]);

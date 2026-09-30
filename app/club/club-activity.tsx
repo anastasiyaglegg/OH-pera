@@ -1,6 +1,7 @@
 'use client';
 /* eslint-disable @next/next/no-img-element -- Shared local/production UI uses existing static artwork with explicit dimensions. */
 import {useCallback,useEffect,useRef,useState,type ReactNode,type CSSProperties} from 'react';
+import {meetingInterests,type ClubProfileData} from './club-profile';
 import ClubFilterSelect from './club-filter-select';
 import {operaIntroduction} from '../../lib/opera-content';
 export type ActivityView='calendar'|'plans'|'messages';
@@ -57,18 +58,44 @@ function Attendees({row,onMessage}:{row:EventRow;onMessage?: (id:string)=>void})
 
 export function FriendProfile({person,api,onClose,onMessage}:{person:Person;api:ClubApi;onClose:()=>void;onMessage:(id:string)=>void}){
  const modal=useRef<HTMLDialogElement>(null);
- const [profile,setProfile]=useState<(Person&{bio?:string})|null>(null);
+ const [profile,setProfile]=useState<ClubProfileData|null>(null);
  const [error,setError]=useState('');
  useEffect(()=>{
   const dialog=modal.current!;const opener=document.activeElement as HTMLElement|null;const overflow=document.body.style.overflow;
   dialog.showModal();document.body.style.overflow='hidden';let current=true;
-  void api<(Person&{bio?:string})[]>('connections').then(people=>{if(!current)return;const match=people.find(p=>p.id===person.id);if(match)setProfile(match);else setError('This profile is no longer available.');}).catch(()=>{if(current)setError('Could not load this profile. Please try again.');});
+  void api<ClubProfileData>('profile_view',{id:person.id}).then(data=>{if(current)setProfile(data);}).catch(()=>{if(current)setError('This profile is unavailable.');});
   return()=>{current=false;dialog.close();document.body.style.overflow=overflow;if(opener?.isConnected)opener.focus();};
  },[api,person.id]);
- return <dialog ref={modal} className="club-conversation-dialog club-friend-profile" aria-labelledby="club-profile-name" onCancel={onClose}><button className="club-conversation-close" aria-label="Close profile" onClick={onClose}>×</button><div className="club-profile-content"><div className="club-avatar" aria-hidden="true">{person.display_name.charAt(0)}</div><h2 id="club-profile-name">{person.display_name}</h2><p className="club-profile-relationship">{person.relationship||'Your connection'}</p>{error?<p role="alert">{error}</p>:!profile?<p role="status">Loading profile…</p>:<><h3>About</h3><p>{profile.bio||'No bio added yet.'}</p><button className="club-primary" onClick={()=>onMessage(person.id)}>Start a chat</button></>}</div></dialog>;
+ return <dialog ref={modal} className="club-conversation-dialog club-friend-profile" aria-labelledby="club-profile-name" onCancel={onClose}><button className="club-conversation-close" aria-label="Close profile" onClick={onClose}>×</button><div className="club-profile-content"><div className="club-avatar" aria-hidden="true">{profile?.photos[0]?<img src={profile.photos[0]} alt="" width={90} height={90}/>:person.display_name.charAt(0)}</div><h2 id="club-profile-name">{profile?.display_name||person.display_name}</h2><p className="club-profile-relationship">{person.relationship||'Your connection'}</p>{error?<p role="alert">{error}</p>:!profile?<p role="status">Loading profile…</p>:<><h3>About</h3><p>{profile.bio||'No bio added yet.'}</p>{profile.interests.length>0&&<><h3>Here for</h3><div className="club-public-interests">{meetingInterests.filter(([value])=>profile.interests.includes(value)).map(([value,label])=><span key={value}>{label}</span>)}</div></>}{profile.photos.length>1&&<div className="club-public-photos">{profile.photos.slice(1).map((photo,index)=><img key={photo} src={photo} alt={`${profile.display_name}, photo ${index+2}`} width={200} height={200}/>)}</div>}<button className="club-primary" onClick={()=>onMessage(person.id)}>Start a chat</button></>}</div></dialog>;
 }
 
-function AttendingCircle({row,onMessage,onProfile}:{row:EventRow;onMessage:(id:string)=>void;onProfile:(person:Person)=>void}){
+function interestLabel(interests:string[]){return meetingInterests.filter(([key])=>interests.includes(key)).map(([,label])=>label).join(', ');}
+function CircleInterest({interests}:{interests:string[]}){
+ const known=meetingInterests.filter(([key])=>interests.includes(key));
+ if(!known.length)return null;
+ const paths:Record<string,ReactNode>={
+  dinner:<><path d="M5 3v6m-3-6v4a3 3 0 0 0 6 0V3M5 10v11M17 3v18m0-18c-4 2-4 9 0 9"/></>,
+  drinks:<><path d="m3 4 9 9 9-9H3Zm9 9v8m-5 0h10"/></>,
+  champagne:<><path d="m7 3 1 7a4 4 0 0 0 8 0l1-7H7Zm5 11v7m-4 0h8M8 7h8"/></>,
+  discussion:<path d="M4 4h16v12H9l-5 4V4Zm4 4h8m-8 4h5"/>,
+  dating:<path d="M12 20 3 11C-2 4 7 0 12 7c5-7 14-3 9 4l-9 9Z"/>,
+  friendship:<><circle cx="8" cy="7" r="3"/><circle cx="17" cy="8" r="2"/><path d="M2 21v-3a6 6 0 0 1 12 0v3m2-8a5 5 0 0 1 6 5v3"/></>
+ };
+ return <span className="club-circle-interest" role="img" aria-label={interestLabel(interests)} title={interestLabel(interests)}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{paths[known[0][0]]}</svg>{known.length>1&&<span className="club-circle-interest-more">+{known.length-1}</span>}</span>;
+}
+function AttendingCircle({row,api,onMessage,onProfile}:{row:EventRow;api:ClubApi;onMessage:(id:string)=>void;onProfile:(person:Person)=>void}){
+ const [profiles,setProfiles]=useState<Record<string,ClubProfileData>>({});
+ const [ownProfile,setOwnProfile]=useState<ClubProfileData|null>(null);
+ const peopleKey=JSON.stringify(row.people.map(person=>person.id));
+ useEffect(()=>{
+  let current=true;
+  const ids=JSON.parse(peopleKey) as string[];
+  void Promise.allSettled(ids.map(id=>api<ClubProfileData>('profile_view',{id}))).then(results=>{
+   if(current)setProfiles(Object.fromEntries(results.flatMap((result,index)=>result.status==='fulfilled'?[[ids[index],result.value]]:[])));
+  });
+  void api<ClubProfileData>('profile_get').then(profile=>{if(current)setOwnProfile(profile);}).catch(()=>{});
+  return()=>{current=false;};
+ },[api,peopleKey]);
  const [paused,setPaused]=useState(false);
  const [expandedId,setExpandedId]=useState<string|null>(null);
  const [hoveredId,setHoveredId]=useState<string|null>(null);
@@ -96,10 +123,10 @@ function AttendingCircle({row,onMessage,onProfile}:{row:EventRow;onMessage:(id:s
   <div className="club-circle-heading"><div><h3>Your circle at this opera</h3><p>{row.total} {row.total===1?'member':'members'} going{self?' · including you':''}</p></div><button className="club-circle-motion" aria-pressed={paused} onClick={()=>setPaused(value=>!value)}>{paused?'Resume motion':'Pause motion'}</button></div>
   <div className="club-circle-scene" ref={scene} onKeyDown={event=>{if(event.key==='Escape'){event.stopPropagation();scene.current?.querySelector<HTMLButtonElement>('.club-friend-bubble[aria-expanded="true"]')?.focus();setExpandedId(null);}}}>
    <div className="club-circle-orbit" aria-hidden="true"/>
-   {self&&<div className="club-circle-you"><span>You</span><small>You’re going</small></div>}
-   {row.people.map((person,index)=><div className={`club-orbit-rotor${expandedId===person.id?' is-expanded':''}${hoveredId===person.id?' is-hovered':''}`} key={person.id} style={{'--orbit-start':`${-90+index*360/Math.max(1,row.people.length)}deg`} as CSSProperties}><div className="club-orbit-satellite"><div className="club-orbit-upright"><button className="club-friend-bubble" onPointerEnter={event=>{if(event.pointerType!=='touch')setHoveredId(person.id)}} onPointerLeave={()=>setHoveredId(null)} aria-label={`View ${person.display_name}`} aria-expanded={expandedId===person.id} onClick={()=>setExpandedId(expandedId===person.id?null:person.id)} title={person.relationship}><span className="club-friend-initial" aria-hidden="true">{person.display_name.charAt(0)}</span><strong>{person.display_name}</strong></button></div></div></div>)}
+   {self&&<div className="club-circle-you"><span>{ownProfile?.photos[0]?<img className="club-circle-photo" src={ownProfile.photos[0]} alt="Your profile" width={78} height={78}/>:"You"}<CircleInterest interests={ownProfile?.interests||[]}/></span><small>You’re going</small></div>}
+   {row.people.map((person,index)=><div className={`club-orbit-rotor${expandedId===person.id?' is-expanded':''}${hoveredId===person.id?' is-hovered':''}`} key={person.id} style={{'--orbit-start':`${-90+index*360/Math.max(1,row.people.length)}deg`} as CSSProperties}><div className="club-orbit-satellite"><div className="club-orbit-upright"><button className="club-friend-bubble" onPointerEnter={event=>{if(event.pointerType!=='touch')setHoveredId(person.id)}} onPointerLeave={()=>setHoveredId(null)} aria-label={`View ${person.display_name}${profiles[person.id]?.interests.length?` · ${interestLabel(profiles[person.id].interests)}`:''}`} aria-expanded={expandedId===person.id} onClick={()=>setExpandedId(expandedId===person.id?null:person.id)} title={person.relationship}><span className="club-circle-portrait">{profiles[person.id]?.photos[0]?<img className="club-circle-photo" src={profiles[person.id].photos[0]} alt="" width={78} height={78}/>:<span className="club-friend-initial" aria-hidden="true">{person.display_name.charAt(0)}</span>}</span><strong className="club-circle-name">{person.display_name}</strong><CircleInterest interests={profiles[person.id]?.interests||[]}/></button></div></div></div>)}
    {row.people.length===0&&<p className="club-circle-empty">{self?'No one in your circle has joined this opera yet.':'No attending friends to show.'}</p>}
-  {expanded&&<div ref={popover} style={position} className="club-expanded-friend club-friend-popover" role="region" aria-label={`${expanded.display_name} connection`}><div><strong>{expanded.display_name}</strong><p>{expanded.relationship||'Your connection'}</p></div><button className="club-collapse-friend" aria-label="Close friend options" onClick={()=>{scene.current?.querySelector<HTMLButtonElement>('.club-friend-bubble[aria-expanded="true"]')?.focus();setExpandedId(null);}}>×</button><div className="club-friend-actions"><button onClick={()=>onProfile(expanded)}>View profile</button><button className="club-primary" onClick={()=>onMessage(expanded.id)}>Start a chat</button></div></div>}
+  {expanded&&<div ref={popover} style={position} className="club-expanded-friend club-friend-popover" role="region" aria-label={`${expanded.display_name} connection`}><div><strong>{expanded.display_name}</strong><p>{expanded.relationship||'Your connection'}</p>{profiles[expanded.id]?.interests.length>0&&<p className="club-circle-interests">{interestLabel(profiles[expanded.id].interests)}</p>}</div><button className="club-collapse-friend" aria-label="Close friend options" onClick={()=>{scene.current?.querySelector<HTMLButtonElement>('.club-friend-bubble[aria-expanded="true"]')?.focus();setExpandedId(null);}}>×</button><div className="club-friend-actions"><button onClick={()=>onProfile(expanded)}>View profile</button><button className="club-primary" onClick={()=>onMessage(expanded.id)}>Start a chat</button></div></div>}
   </div>
   <p className="club-circle-caption">{row.people.length>0?'Select a friend to view their profile or start a chat.':''}{others>0?` ${others} other ${others===1?'member is':'members are'} going · names stay private.`:''}</p>
  </section>;
@@ -198,7 +225,7 @@ export default function ClubActivity({api,view,onView,onPlansCount}:{api:ClubApi
     {view!=='plans'&&<Attendees row={row}/>}
    </article>
   </div>;})}</OperaCarousel>)}
-  {view==='plans'&&!loading&&activePlan&&<div id="selected-opera-circle"><div className="club-selected-opera-label" aria-live="polite"><span>Your circle for</span><strong>{activePlan.performance.title}</strong><span>{dateLabel(activePlan.performance.date)} · {timeLabel(activePlan.performance.time)}{activePlan.performance.time?' ET':''}</span></div><AttendingCircle key={activePlan.performance.id} row={activePlan} onMessage={openThread} onProfile={setProfilePerson}/></div>}
+  {view==='plans'&&!loading&&activePlan&&<div id="selected-opera-circle"><div className="club-selected-opera-label" aria-live="polite"><span>Your circle for</span><strong>{activePlan.performance.title}</strong><span>{dateLabel(activePlan.performance.date)} · {timeLabel(activePlan.performance.time)}{activePlan.performance.time?' ET':''}</span></div><AttendingCircle key={activePlan.performance.id} row={activePlan} api={api} onMessage={openThread} onProfile={setProfilePerson}/></div>}
   {selected&&(view==='plans' ||view==='messages')&&<dialog ref={conversationDialog} className="club-conversation-dialog" aria-labelledby="club-conversation-title" onCancel={()=>setSelected('')}><button className="club-conversation-close" aria-label="Close conversation" onClick={()=>setSelected('')}>×</button><div className="club-chat"><h2 id="club-conversation-title">{selectedPerson?.display_name||'Private conversation'}</h2>{error&&<p role="alert">{error}</p>}<div className="club-chat-log" aria-label="Messages">{thread&&hasEarlier&&<button onClick={()=>void action(async()=>{const older=await api<Thread>('thread',{id:selected,before:thread.messages[0].id});setHasEarlier(older.messages.length===50);setThread(previous=>combineThread(previous,older));})}>Load earlier messages</button>}{thread?.messages.map(message=><div key={message.id} className={message.mine?'club-message mine':'club-message'}><small>{message.mine?'You':selectedPerson?.display_name}</small><p>{messageText(message.body)}</p><time dateTime={message.created_at}>{new Date(message.created_at).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})}</time></div>)}{!thread&&<p role="status">Loading conversation…</p>}{thread?.messages.length===0&&<p>No messages yet. Say hello.</p>}</div>{thread?.can_message?<form onSubmit={e=>{e.preventDefault();void action(async()=>{await api('send',{id:selected,body:draft});setDraft('');const next=await api<Thread>('thread',{id:selected});setThread(previous=>combineThread(previous,next));await refresh();});}}><label>Message<textarea value={draft} onChange={e=>setDraft(e.target.value)} maxLength={2000} rows={3} required placeholder="Suggest a time and place to meet…"/></label><div className="club-actions"><button className="club-primary" disabled={busy||!draft.trim()}>Send message</button><span className="club-fine-print">{draft.length}/2000 · No read receipts or online status shared.</span></div></form>:thread&&<p>This conversation is read-only. Existing messages are kept.</p>}</div></dialog>}
  {profilePerson&&<FriendProfile person={profilePerson} api={api} onClose={()=>setProfilePerson(null)} onMessage={id=>{setProfilePerson(null);openThread(id);}}/>}
  {detail&&<OperaDetails performance={detail} onClose={()=>setDetail(null)}/>}
