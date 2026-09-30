@@ -60,7 +60,7 @@ test('attendance and private messaging enforce server-side club boundaries',asyn
   const past=(await as(2,'plans'))[0];assert.deepEqual(past.people,[]);assert.equal(past.total,0);
  });
  await t.test('former participants retain history only and private tables remain inaccessible',async()=>{
-  await as(1,'admin_status',{id:memberId(3),status:'left'});
+  await as(2,'remove_invitee',{id:memberId(3),confirmed:true});
   assert.equal((await as(2,'inbox')).find(x=>x.id===memberId(3)).display_name,'Former member');
   await assert.rejects(as(3,'inbox'),/Active membership/);
   await db.exec('set role authenticated');

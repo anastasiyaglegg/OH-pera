@@ -1099,3 +1099,13 @@ footer .film-credit p,footer .sources-updates>p{font:13px/1.8 var(--sans);color:
 .club-circle-interest-more{position:absolute;left:19px;top:-5px;min-width:17px;border:1px solid #d6b577;border-radius:999px;padding:0 3px;background:#fffdf9;font:500 9px/15px var(--sans)}
 .club-circle-you small{margin-top:14px}
 .club-friend-popover .club-circle-interests{font-size:12px;line-height:1.5;color:#806019}
+
+/* Reversible UX trial: compact inbox and navigation confirmation. */
+.club-conversations-entry { margin: 12px 0 24px; }
+#club-conversation-list { display: grid; gap: 10px; margin-top: 12px; max-width: 650px; }
+#club-conversation-list > button { display: flex; justify-content: space-between; gap: 16px; text-align: left; }
+#club-conversation-list > button span { font-size: 13px; color: var(--muted, #71666a); }
+#selected-opera-circle { scroll-margin-top: 110px; }
+.club-leave-dialog { padding: 28px; max-width: min(560px, calc(100vw - 32px)); }
+.club-leave-dialog h2 { font-size: 30px; margin: 0 0 12px; }
+.club-leave-dialog .club-actions { flex-wrap: wrap; margin-top: 20px; }

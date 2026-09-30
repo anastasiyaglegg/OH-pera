@@ -3,11 +3,11 @@ import {readFileSync} from 'node:fs';
 export const memberId=n=>`10000000-0000-0000-0000-${String(n).padStart(12,'0')}`;
 export async function createClubFixture({schedule}={}){
  const db=new PGlite();
- await db.exec(`create role anon;create role authenticated;create role service_role;create schema auth;create table auth.users(id uuid primary key,email text,email_confirmed_at timestamptz);create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;grant usage on schema auth to authenticated;grant execute on function auth.uid() to authenticated;`);
- for(const name of ['20260929130209_private_club_membership.sql','20260929132042_club_attendance_messages.sql','20260930141454_manage_direct_invitee.sql','20260930160509_member_profiles.sql'])await db.exec(readFileSync(new URL(`../../supabase/migrations/${name}`,import.meta.url),'utf8'));
+ await db.exec(`create role anon;create role authenticated;create role service_role;create schema auth;create table auth.users(id uuid primary key,email text,email_confirmed_at timestamptz,raw_user_meta_data jsonb not null default '{}');create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;grant usage on schema auth to authenticated;grant execute on function auth.uid() to authenticated;create schema storage;create table storage.buckets(id text primary key,name text not null,public boolean not null default false);create table storage.objects(bucket_id text not null,name text not null,primary key(bucket_id,name));create function storage.foldername(name text) returns text[] language sql immutable as $$select string_to_array(name,'/')$$;`);
+ for(const name of ['20260929130209_private_club_membership.sql','20260929132042_club_attendance_messages.sql','20260930141454_manage_direct_invitee.sql','20260930150000_preserve_inviter_only_removal.sql','20260930160000_member_account_profiles.sql','20260930160509_member_profiles.sql'])await db.exec(readFileSync(new URL(`../../supabase/migrations/${name}`,import.meta.url),'utf8'));
  const names=['Sofia','Maya','Ahmet','Lina','Noah','Elena'];
  for(let n=1;n<=6;n++){
-  await db.query('insert into auth.users values($1,$2,now())',[memberId(n),`demo${n}@example.test`]);
+  await db.query('insert into auth.users values($1,$2,now(),$3::jsonb)',[memberId(n),`demo${n}@example.test`,JSON.stringify({username:`member_${n}`,first_name:names[n-1],last_name:'Example',date_of_birth:'1990-01-01'})]);
   await db.query(`insert into club_private.members(id,user_id,inviter_id,is_admin,display_name,bio,adult_confirmed_at) values($1,$1,$2,$3,$4,'A fictional member for the local preview.',now())`,[memberId(n),n===1||n===6?null:memberId(n-1),n===1||n===6,names[n-1]]);
  }
  let queue=Promise.resolve();

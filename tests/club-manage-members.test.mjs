@@ -13,6 +13,11 @@ test('direct invitee management enforces ownership and keeps descendants',async 
   await assert.rejects(as(2,'remove_invitee',{id:memberId(3)}),/Confirm removal/);
   await assert.rejects(as(0,'remove_invitee',{id:memberId(3),confirmed:true}),/permission denied/);
  });
+ await t.test('an administrator cannot remove a member outside the invitation relationship',async()=>{
+  await db.query('update club_private.members set user_id=$1 where id=$1',[memberId(6)]);
+  await assert.rejects(as(6,'admin_status',{id:memberId(3),status:'left'}),/Only the direct inviter can remove a member/);
+  assert.equal((await as(3,'me')).status,'active');
+ });
  await t.test('removal revokes a pending invitation and removed member access',async()=>{
   await as(5,'invite',{email:'friend@example.test'});
   const pending=(await as(5,'invitation_state')).history.find(i=>i.status==='pending');

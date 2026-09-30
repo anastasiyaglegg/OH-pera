@@ -6,7 +6,8 @@ test('member profile permissions and validation',async t=>{
  const {db,as}=await createClubFixture();
  try{
  await t.test('own fields persist, account email cannot be overwritten',async()=>{
-  await as(2,'profile_save',data);const own=await as(2,'profile_get');assert.equal(own.last_name,'Tester');assert.equal(own.email,'demo2@example.test');assert.equal(own.date_of_birth,'1994-05-12');
+  await as(2,'profile_save',data);const own=await as(2,'profile_get');assert.equal(own.last_name,'Tester');assert.equal(own.email,'demo2@example.test');assert.equal(own.date_of_birth,'1994-05-12');assert.deepEqual(own.interests,data.interests);
+  await as(2,'profile_save',{...data,interests:['champagne','dinner','champagne','discussion']});assert.deepEqual((await as(2,'profile_get')).interests,['champagne','dinner','discussion']);
   await assert.rejects(as(2,'profile_save',{...data,email:'replacement@example.test'}));await assert.rejects(as(2,'profile_save',{...data,id:memberId(3)}));
  });
  await t.test('connections can view interests but never private attributes',async()=>{

@@ -80,8 +80,18 @@ This branch is a draft integration handoff, not a launch-ready replacement for p
 
 ## Member profile follow-up — September 30
 
-After the three club migrations, apply `20260930160509_member_profiles.sql` on staging after review. The editor uses owner-only `profile_get` / `profile_save`; friend dialogs use `profile_view`, which checks active membership, allowed connections and reciprocal blocks. Email comes from Auth and is not changed through the profile RPC. DOB and optional gender never enter the friend projection. Server validation enforces 18+, valid names, allowed interests and bounded photos.
+After the existing club migrations, including `20260930150000_preserve_inviter_only_removal.sql` and `20260930160000_member_account_profiles.sql`, review and apply `20260930160509_member_profiles.sql` on staging. The editor uses owner-only `profile_get` / `profile_save`; friend dialogs use `profile_view`, which checks active membership, allowed connections and reciprocal blocks. Email comes from Auth and is not changed through the profile RPC. DOB and optional gender never enter the friend projection. Server validation enforces 18+, valid names, allowed interests and bounded photos.
 
 The prototype stores up to three resized JPEG thumbnails in a private profile row (90,000 characters per photo maximum), returned only through the authorized profile RPC. It does not create public photo URLs. The browser resizes and re-encodes JPEG/PNG/WebP input before saving, discarding original file metadata. Move full-resolution galleries to private Supabase Storage with equivalent access policies before expanding beyond this small prototype. No remote migration, photo upload or real account changes have been performed by this work.
 
 Local testing: use My profile in the tester menu, complete fictional first/last name and DOB, choose multiple interests, upload demo artwork, save, then return to verify persistence. A connected member sees the name, bio, interests and photos, without email, DOB or gender. Prototype data resets when the preview process restarts.
+
+## Integration with main and UX trial
+
+The profile editor now uses the account fields on `club_private.members` introduced by PR #29. `member_profiles` contains only the bounded photo gallery and its timestamp. Both `account_profile` and the new profile RPCs read the same names, birthday, gender and interests. Interest labels are mapped at the API boundary; their stored order determines the primary badge. Usernames and existing portrait paths survive updates. Existing private Storage portraits are signed for their owner in the editor; new gallery thumbnails use the authorized profile RPC. No Storage permissions were broadened.
+
+The public dispatcher preserves `account_profile`, invitation management and PR #27’s rejection of `admin_status` with `left`. Google login and invitation onboarding from main remain. Integration tests cover both API directions, portrait-path preservation, duplicate usernames, private projections and inviter-only removal.
+
+The reversible UX trial adds Discover navigation, ticket access inside opera details, Conversations in My Plans, replacement invitation links, unsaved-profile navigation protection and a primary profile interest. Rollback checkpoints: `codex/before-ux-trial` (before the UX trial) and commit `cc22530` (trial before main integration).
+
+Validation: 75 tests, TypeScript, changed-component lint and production build passed locally; browser profile save and local preview were checked. Before release, validate real Google/password login, invited registration, existing private portraits and the reviewed migration on staging. The revised gallery migration is unmerged; if an earlier draft was manually applied to a database, do not rerun it over that database—prepare a separate data-preserving upgrade first. No remote migration or production deployment was performed.
