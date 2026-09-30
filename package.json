@@ -12,7 +12,9 @@
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
     "test:data": "node --test tests/*.test.mjs",
     "data:refresh": "node scripts/refresh-data.mjs",
-    "data:audit": "node scripts/audit-data.mjs"
+    "data:audit": "node scripts/audit-data.mjs",
+    "demo:club": "node scripts/club-preview.mjs",
+    "club:sync": "node scripts/sync-club-schedule.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
@@ -24,6 +26,7 @@
   "devDependencies": {
     "@cloudflare/vite-plugin": "^1.59.0",
     "@cloudflare/workers-types": "^5.20260924.1",
+    "@electric-sql/pglite": "0.5.8",
     "@openai/sites-vite-plugin": "^0.1.0 || ^0.2.0",
     "@tailwindcss/postcss": "4.2.1",
     "@types/node": "22.19.19",
@@ -32,6 +35,7 @@
     "@vitejs/plugin-react": "6.1.1",
     "@vitejs/plugin-rsc": "^0.5.35",
     "cheerio": "1.2.0",
+    "esbuild": "0.28.1",
     "eslint": "9.39.4",
     "eslint-config-next": "16.3.5",
     "react-server-dom-webpack": "^19.3.0",
