@@ -17,7 +17,6 @@ export default function AccountMenu({loginRequest=0,onCancelSave}:{loginRequest?
  useEffect(()=>{if(loginRequest){setSavingAfterLogin(Boolean(readQueuedSave(window.sessionStorage)));setMessage('');setMode('login');}},[loginRequest]);
  const open=(next:Mode)=>{setMessage('');setMode(next);};
  const close=()=>{onCancelSave();setMode(null);setMessage('');};
- const google=async()=>{const client=getSupabaseBrowserClient();if(!client){setMessage('Account access is temporarily unavailable. Please try again later.');return;}setBusy(true);const {error}=await client.auth.signInWithOAuth({provider:'google',options:{redirectTo:`${window.location.origin}/`}});if(error){setMessage(error.message);setBusy(false);}};
  const submit=async(event:React.FormEvent<HTMLFormElement>)=>{event.preventDefault();const client=getSupabaseBrowserClient();if(!client){setMessage('Account access is temporarily unavailable. Please try again later.');return;}const form=new FormData(event.currentTarget),email=String(form.get('email')||''),password=String(form.get('password')||'');setBusy(true);setMessage('');
   if(mode==='create'){
    const confirm=String(form.get('confirmPassword')||'');if(password!==confirm){setMessage('Passwords do not match.');setBusy(false);return;}
@@ -47,8 +46,6 @@ export default function AccountMenu({loginRequest=0,onCancelSave}:{loginRequest?
     {mode==='create'&&<label>Confirm password<input name="confirmPassword" type="password" autoComplete="new-password" minLength={8} required/></label>}
     <button type="submit" className="auth-submit" disabled={busy||!configured}>{busy?'Please wait…':mode==='create'?'Create account':'Log in'}</button>
    </form>
-   <div className="auth-divider"><span>or</span></div>
-   <button type="button" className="google-login" onClick={google} disabled={busy||!configured}>Continue with Google</button>
    {message&&<p className="auth-message" role="status">{message}</p>}
    <button type="button" className="auth-switch" onClick={()=>open(mode==='create'?'login':'create')}>{mode==='create'?'Already have an account? Log in':'New to OH-pera? Create an account'}</button>
   </dialog>
