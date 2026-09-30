@@ -41,8 +41,11 @@ export default function ClubClient(){
  const [invitationOpen,setInvitationOpen]=useState(false);
  useEffect(()=>{if(invitationOpen&&!authOpen&&authReady&&!checking&&member?.status!=='active')invitationDialog.current?.showModal();else invitationDialog.current?.close();},[invitationOpen,authOpen,authReady,checking,member]);
  useEffect(()=>{
-  const fragment=new URLSearchParams(window.location.hash.slice(1)).get('invite');
-  if(new URLSearchParams(window.location.search).get('reset-password')==='1'){setAuthMode('reset');setAuthOpen(true);}
+  const search=new URLSearchParams(window.location.search);
+  const hash=new URLSearchParams(window.location.hash.slice(1));
+  const fragment=hash.get('invite');
+  const recovery=search.get('reset-password')==='1';
+  if(recovery)queueMicrotask(()=>{setAuthMode('reset');setAuthOpen(true);});
   let remembered='';try{remembered=sessionStorage.getItem(TOKEN_KEY)||'';}catch{}
   // Browser-only invitation state is read after hydration.
   // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -50,7 +53,22 @@ export default function ClubClient(){
   else if(/^[a-f0-9]{64}$/.test(remembered)){setToken(remembered);setInvitationOpen(true);}
   else if(window.location.hash==='#accept-invitation')setInvitationOpen(true);
   const client=getSupabaseBrowserClient();if(!client){setAuthReady(true);return;}
-  const {data}=client.auth.onAuthStateChange((_event:AuthChangeEvent,next:Session|null)=>{setSession(next);setChecking(false);setAuthReady(true);setMember(null);setPlansCount(null);setConnections([]);setInvitations(null);setMessage('');});
+  const {data}=client.auth.onAuthStateChange((event:AuthChangeEvent,next:Session|null)=>{setSession(next);setChecking(false);setAuthReady(true);setMember(null);setPlansCount(null);setConnections([]);setInvitations(null);if(event==='PASSWORD_RECOVERY'){setAuthMode('reset');setAuthOpen(true);}else setMessage('');});
+  if(recovery)void (async()=>{
+   const {data:{session:existingSession}}=await client.auth.getSession();
+   if(existingSession)return;
+   const code=search.get('code');
+   if(code){
+    const {error}=await client.auth.exchangeCodeForSession(code);
+    if(!error){window.history.replaceState(null,'',`${window.location.pathname}?reset-password=1`);return;}
+   }
+   const access_token=hash.get('access_token'),refresh_token=hash.get('refresh_token');
+   if(access_token&&refresh_token){
+    const {error}=await client.auth.setSession({access_token,refresh_token});
+    if(!error){window.history.replaceState(null,'',`${window.location.pathname}?reset-password=1`);return;}
+   }
+   setMessage('This password reset link is invalid or has expired. Request a new one from Member login.');
+  })();
   return()=>data.subscription.unsubscribe();
  },[]);
  useEffect(()=>{if(authOpen)dialog.current?.showModal();else dialog.current?.close();},[authOpen]);
@@ -87,7 +105,7 @@ export default function ClubClient(){
  }
  async function setNewPassword(event:React.FormEvent<HTMLFormElement>){
   event.preventDefault();const form=new FormData(event.currentTarget);const password=String(form.get('password')||'');
-  await act(async()=>{if(password!==String(form.get('verifyPassword')||''))throw new Error('Passwords do not match.');const client=getSupabaseBrowserClient();if(!client)throw new Error('Account access is not available yet.');const {error}=await client.auth.updateUser({password});if(error)throw error;window.history.replaceState(null,'',window.location.pathname);setMessage('Password updated. You are signed in.');setAuthOpen(false);});
+  await act(async()=>{if(password!==String(form.get('verifyPassword')||''))throw new Error('Passwords do not match.');const client=getSupabaseBrowserClient();if(!client)throw new Error('Account access is not available yet.');const {data:{session:recoverySession}}=await client.auth.getSession();if(!recoverySession)throw new Error('This password reset link is invalid or has expired. Request a new one from Member login.');const {error}=await client.auth.updateUser({password});if(error)throw error;window.history.replaceState(null,'',window.location.pathname);setMessage('Password updated. You are signed in.');setAuthOpen(false);});
  }
  async function accept(event:React.FormEvent<HTMLFormElement>){event.preventDefault();const form=new FormData(event.currentTarget);const details=registrationData(form);await act(async()=>{
   const client=getSupabaseBrowserClient();if(!client)throw new Error('Account access is not available yet.');
