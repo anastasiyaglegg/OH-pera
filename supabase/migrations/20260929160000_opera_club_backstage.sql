@@ -13,7 +13,7 @@ create table club_private.members (
   biography text not null default '' check (char_length(biography) <= 500),
   inviter_id uuid references club_private.members(user_id) on delete restrict,
   role text not null default 'member' check (role in ('member', 'admin')),
-  status text not null default 'active' check (status in ('active', 'suspended', 'left')),
+  status text not null default 'active' check (status in ('active', 'suspended', 'left', 'removed')),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );

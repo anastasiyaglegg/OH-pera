@@ -279,6 +279,48 @@ begin
 end;
 $$;
 
+create function public.club_remove_invited_member(requested_member_id uuid)
+returns void
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  active_member uuid := club_private.current_active_member_id();
+  invited_member club_private.members%rowtype;
+begin
+  if active_member is null then
+    raise exception 'Active club membership is required';
+  end if;
+  if requested_member_id = active_member then
+    raise exception 'Members cannot remove themselves with this action';
+  end if;
+
+  select * into invited_member
+  from club_private.members
+  where user_id = requested_member_id
+  for update;
+
+  if not found or invited_member.inviter_id <> active_member then
+    raise exception 'Only the member who issued this invitation can remove this member';
+  end if;
+  if invited_member.status <> 'active' then
+    raise exception 'This member is no longer active';
+  end if;
+
+  update club_private.meetups
+  set status = 'cancelled', updated_at = now()
+  where host_user_id = requested_member_id and status = 'active';
+
+  delete from club_private.meetup_members
+  where user_id = requested_member_id;
+
+  update club_private.members
+  set status = 'removed', updated_at = now()
+  where user_id = requested_member_id;
+end;
+$$;
+
 create function public.club_send_message(requested_recipient_id uuid, requested_body text)
 returns uuid
 language plpgsql
@@ -349,6 +391,7 @@ revoke all on function public.club_cancel_meetup(uuid) from public;
 revoke all on function public.club_update_meetup(uuid, text, text, timestamptz, text, integer) from public;
 revoke all on function public.club_meetup_attendees(uuid) from public;
 revoke all on function public.club_remove_meetup_member(uuid, uuid) from public;
+revoke all on function public.club_remove_invited_member(uuid) from public;
 revoke all on function public.club_send_message(uuid, text) from public;
 revoke all on function public.club_list_messages(uuid) from public;
 
@@ -360,6 +403,7 @@ grant execute on function public.club_cancel_meetup(uuid) to authenticated;
 grant execute on function public.club_update_meetup(uuid, text, text, timestamptz, text, integer) to authenticated;
 grant execute on function public.club_meetup_attendees(uuid) to authenticated;
 grant execute on function public.club_remove_meetup_member(uuid, uuid) to authenticated;
+grant execute on function public.club_remove_invited_member(uuid) to authenticated;
 grant execute on function public.club_send_message(uuid, text) to authenticated;
 grant execute on function public.club_list_messages(uuid) to authenticated;
 
