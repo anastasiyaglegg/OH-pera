@@ -35,41 +35,6 @@ create unique index invitations_one_pending_per_inviter
   on club_private.invitations (inviter_id)
   where status = 'pending';
 
-create table club_private.performances (
-  performance_id text primary key check (char_length(performance_id) between 1 and 500),
-  performance jsonb not null check (jsonb_typeof(performance) = 'object' and performance->>'id' = performance_id),
-  source_updated_at timestamptz,
-  imported_at timestamptz not null default now()
-);
-
-create table club_private.meetups (
-  id uuid primary key default gen_random_uuid(),
-  performance_id text not null references club_private.performances(performance_id) on delete restrict,
-  host_user_id uuid not null references club_private.members(user_id) on delete restrict,
-  title text not null check (char_length(trim(title)) between 1 and 120),
-  details text not null default '' check (char_length(details) <= 1000),
-  meeting_time timestamptz not null,
-  meeting_location text not null check (char_length(trim(meeting_location)) between 1 and 250),
-  capacity integer not null check (capacity between 2 and 30),
-  status text not null default 'active' check (status in ('active', 'cancelled')),
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
-);
-
-create index meetups_by_performance on club_private.meetups (performance_id, meeting_time)
-  where status = 'active';
-
-create table club_private.meetup_members (
-  meetup_id uuid not null references club_private.meetups(id) on delete cascade,
-  user_id uuid not null references club_private.members(user_id) on delete cascade,
-  joined_at timestamptz not null default now(),
-  primary key (meetup_id, user_id)
-);
-
--- The host is an attendee by definition. A later club command will insert this
--- row atomically when it publishes a meetup, along with capacity enforcement.
-create index meetup_members_by_user on club_private.meetup_members (user_id, joined_at desc);
-
 create table club_private.blocks (
   blocker_id uuid not null references club_private.members(user_id) on delete cascade,
   blocked_id uuid not null references club_private.members(user_id) on delete cascade,
@@ -92,9 +57,6 @@ create index messages_by_sender on club_private.messages (sender_id, created_at 
 
 alter table club_private.members enable row level security;
 alter table club_private.invitations enable row level security;
-alter table club_private.performances enable row level security;
-alter table club_private.meetups enable row level security;
-alter table club_private.meetup_members enable row level security;
 alter table club_private.blocks enable row level security;
 alter table club_private.messages enable row level security;
 
