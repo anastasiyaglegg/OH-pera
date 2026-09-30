@@ -15,17 +15,17 @@ const geistMono = Geist_Mono({
 const displayFont = Bodoni_Moda({variable: '--font-display', subsets: ['latin'], weight: ['400', '500', '600'], style: ['normal', 'italic'], display: 'swap'});
 
 export const metadata: Metadata = {
-  title: 'OH-pera! — Opera across New York City',
-  description: 'Discover upcoming opera performances from five New York City organizations in one simple place.',
+  title: 'OH-pera! — Your private opera circle',
+  description: 'A private opera club that grows one personal invitation at a time.',
   openGraph: {
-    title: 'OH-pera! — Opera across New York City',
-    description: 'Opera across New York City, all in one place.',
+    title: 'OH-pera! — Your private opera circle',
+    description: 'Share an opera evening with the people you know.',
     images: ['/og.png'],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'OH-pera! — Opera across New York City',
-    description: 'Opera across New York City, all in one place.',
+    title: 'OH-pera! — Your private opera circle',
+    description: 'Share an opera evening with the people you know.',
     images: ['/og.png'],
   },
 };
