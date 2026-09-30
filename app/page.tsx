@@ -7,8 +7,8 @@
 // performances..." never resolving).
 export const dynamic = 'force-dynamic';
 
-import Home from './home-client';
+import ClubClient from './club/club-client';
 
 export default function Page() {
-  return <Home />;
+  return <ClubClient />;
 }

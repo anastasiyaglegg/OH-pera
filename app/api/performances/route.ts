@@ -1,3 +1,4 @@
+import {clubAccessStatus} from '../../../lib/supabase/club-access';
 import curated from '../../../data/curated.json';
 import bundled from '../../../data/schedule.json';
 import {mergeCurated,type CuratedPerformance} from '../../../lib/curated';
@@ -25,9 +26,12 @@ async function loadSchedule():Promise<Snapshot>{
  })();
  try{return await pending;}finally{pending=null;}
 }
-export async function GET(){
+export async function GET(request:Request){
+ const headers={'Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff'};
+ const status=await clubAccessStatus(request.headers.get('authorization'),process.env.NEXT_PUBLIC_SUPABASE_URL,process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY);
+ if(status!==200)return Response.json({error:status===401?'Sign in required':status===403?'Active membership required':'Membership service unavailable'},{status,headers});
  const {schedule,delivery}=await loadSchedule();
  const today=new Intl.DateTimeFormat('en-CA',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
  const performances=mergeCurated(schedule.performances,curated as CuratedPerformance[],today);
- return Response.json({...schedule,performances,delivery},{headers:{'Cache-Control':'public, max-age=60, s-maxage=300','X-Content-Type-Options':'nosniff'}});
+ return Response.json({...schedule,performances,delivery},{headers});
 }
