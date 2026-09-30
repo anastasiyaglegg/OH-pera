@@ -62,6 +62,11 @@ export default function ClubClient(){
     const {error}=await client.auth.exchangeCodeForSession(code);
     if(!error){window.history.replaceState(null,'',`${window.location.pathname}?reset-password=1`);return;}
    }
+   const token_hash=search.get('token_hash');
+   if(token_hash&&search.get('type')==='recovery'){
+    const {error}=await client.auth.verifyOtp({token_hash,type:'recovery'});
+    if(!error){window.history.replaceState(null,'',`${window.location.pathname}?reset-password=1`);return;}
+   }
    const access_token=hash.get('access_token'),refresh_token=hash.get('refresh_token');
    if(access_token&&refresh_token){
     const {error}=await client.auth.setSession({access_token,refresh_token});
