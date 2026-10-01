@@ -47,6 +47,15 @@ export default function ClubClient(){
   else if(window.location.hash==='#accept-invitation')setInvitationOpen(true);
   const client=getSupabaseBrowserClient();if(!client){setAuthReady(true);return;}
   const {data}=client.auth.onAuthStateChange((event:AuthChangeEvent,next:Session|null)=>{setSession(next);setChecking(false);setAuthReady(true);setMember(null);setPlansCount(null);if(event==='PASSWORD_RECOVERY'){setAuthMode('reset');setAuthOpen(true);}else setMessage('');});
+  if(!recovery)void (async()=>{
+   const {data:{session:existingSession}}=await client.auth.getSession();
+   if(existingSession){setSession(existingSession);setAuthReady(true);return;}
+   const code=search.get('code');
+   if(!code){setAuthReady(true);return;}
+   const {data:exchange,error}=await client.auth.exchangeCodeForSession(code);
+   if(!error){setSession(exchange.session);setAuthReady(true);window.history.replaceState(null,'',window.location.pathname);}
+   else{setAuthReady(true);setMessage('Google sign-in could not be completed. Please try again.');}
+  })();
   if(recovery)void (async()=>{
    const {data:{session:existingSession}}=await client.auth.getSession();
    if(existingSession)return;
