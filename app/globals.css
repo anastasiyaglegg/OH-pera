@@ -1109,3 +1109,188 @@ footer .film-credit p,footer .sources-updates>p{font:13px/1.8 var(--sans);color:
 .club-leave-dialog { padding: 28px; max-width: min(560px, calc(100vw - 32px)); }
 .club-leave-dialog h2 { font-size: 30px; margin: 0 0 12px; }
 .club-leave-dialog .club-actions { flex-wrap: wrap; margin-top: 20px; }
+
+/* The tester and authenticated club use the same typography. */
+.club-app{--display:Georgia,'Times New Roman',serif;--sans:Arial,Helvetica,sans-serif;--field-font:400 14px/24px var(--sans);font-family:var(--sans)}
+
+@media(max-width:600px){
+ .club-app .club-header.club-unified-header .club-brand,
+ .club-app .club-header.club-unified-header .club-brand img{height:52px}
+}
+
+/* Shared mobile navigation disclosure; desktop retains its horizontal menu. */
+.club-app .club-header.club-unified-header .club-mobile-menu-toggle{display:none}
+@media(max-width:1024px){
+ .club-app .site-header.club-header.club-unified-header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;padding:8px 14px;min-height:68px}
+ .club-app .club-header.club-unified-header .club-mobile-menu-toggle{display:inline-flex;align-items:center;justify-content:center;gap:10px;order:1;margin-left:auto;min-height:44px;font:400 14px/24px var(--sans)}
+ .club-app .club-header.club-unified-header nav.club-demo-nav{display:none;order:2;flex:1 0 100%;width:100%;margin:0;padding:8px 0 4px;overflow:visible}
+ .club-app .club-header.club-unified-header.is-menu-open nav.club-demo-nav{display:flex;flex-direction:column;align-items:stretch;gap:8px}
+ .club-app .club-header.club-unified-header nav.club-demo-nav button{width:100%;min-height:44px;margin:0;padding:10px 16px;text-align:left;white-space:normal;font:400 14px/24px var(--sans)}
+}
+
+/* Responsive member hierarchy and filters: shared by the tester and live app. */
+.club-app .club-calendar-welcome h1{font:400 clamp(24px,2.3vw,32px)/1.2 var(--display);letter-spacing:-.025em;margin:0 0 10px}
+.club-app .club-calendar-welcome p:not(.club-kicker){font:400 14px/1.5 var(--sans)}
+.club-app .club-calendar-welcome .club-kicker{font:400 12px/1.5 var(--sans);letter-spacing:.06em}
+.club-secondary-filters{display:contents}
+.club-app button.club-mobile-filters-toggle{display:none}
+.club-back-to-plans{display:inline-flex;align-items:center;min-height:44px;margin-bottom:12px;font:14px/1.5 var(--sans)}
+@media(max-width:600px){
+ .club-app{--field-font:400 16px/24px var(--sans)}
+ .club-app .club-discovery-filters{display:grid;grid-template-columns:minmax(0,1fr) auto;padding:14px;gap:10px;align-items:end}
+ .club-app .club-discovery-filters>label:first-child{grid-column:1/-1}
+ .club-app button.club-mobile-filters-toggle{display:inline-flex;grid-column:1/-1;justify-content:center;align-items:center;min-height:44px;padding:8px 16px;font:400 16px/24px var(--sans)}
+ .club-app .club-secondary-filters{display:none;grid-column:1/-1}
+ .club-app .club-secondary-filters.is-open{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;padding-top:4px}
+ .club-app .club-calendar-welcome h1{font-size:24px}
+ .club-app .club-calendar-welcome p:not(.club-kicker){font-size:14px}
+}
+
+/* Consistent, larger brand mark across landing, member and tester headers. */
+.club-app .club-header.club-unified-header :is(.club-brand,.club-demo-logo){width:210px;height:68px;flex-shrink:0}
+.club-app .club-header.club-unified-header .club-brand img{width:100%;height:68px;object-fit:contain}
+@media(max-width:1024px){
+ .club-app .club-header.club-unified-header :is(.club-brand,.club-demo-logo){width:174px;height:58px}
+ .club-app .club-header.club-unified-header .club-brand img{height:58px}
+}
+.club-app .club-header.club-unified-header img.club-demo-logo{height:68px;object-fit:contain}
+@media(max-width:1024px){.club-app .club-header.club-unified-header img.club-demo-logo{height:58px}}
+
+.club-app .club-header.club-unified-header :is(.club-brand,.club-demo-logo){width:232px;height:76px;cursor:default}
+.club-app .club-header.club-unified-header :is(.club-brand img,img.club-demo-logo){height:76px;object-fit:contain}
+@media(max-width:1024px){
+ .club-app .club-header.club-unified-header :is(.club-brand,.club-demo-logo){width:192px;height:64px}
+ .club-app .club-header.club-unified-header :is(.club-brand img,img.club-demo-logo){height:64px}
+}
+
+/* Compact mobile density without reducing touch targets or input legibility. */
+@media(max-width:600px){
+ .club-app .site-header.club-header.club-unified-header{margin:6px 10px 0;top:6px;padding:4px 12px;min-height:60px;border-radius:22px;gap:6px}
+ .club-app .club-header.club-unified-header :is(.club-brand,.club-demo-logo){width:168px;height:54px}
+ .club-app .club-header.club-unified-header :is(.club-brand img,img.club-demo-logo){height:54px}
+ .club-app .club-main{padding:0 12px 28px}
+ .club-app .club-calendar-welcome{padding:12px 2px;margin:0}
+ .club-app .club-calendar-welcome h1{font-size:21px;line-height:1.2;margin:0 0 6px}
+ .club-app .club-calendar-welcome .club-kicker{font-size:10px;line-height:1.4;margin:0 0 5px}
+ .club-app .club-calendar-welcome p:not(.club-kicker){font-size:13px;line-height:1.4;margin:0}
+ .club-app .club-discovery-filters{padding:10px;gap:8px;border-radius:20px;grid-template-columns:minmax(0,1fr) auto}
+ .club-app .club-discovery-filters>label:first-child{grid-column:1;font-size:12px;line-height:18px}
+ .club-app button.club-mobile-filters-toggle{grid-column:2;padding:8px 12px;min-height:48px;font-size:14px}
+ .club-app .club-carousel-controls{margin:8px 0;min-height:44px}
+ .club-app .club-carousel-controls button{width:44px;height:44px;padding:0}
+ .club-app .club-opera-carousel .club-evenings{gap:8px 12px;grid-auto-columns:90%}
+ .club-app .club-opera-slide .club-refined-card{padding:10px;border-radius:24px;gap:8px}
+ .club-app .club-refined-card .club-card-heading{padding:4px 4px 0}
+ .club-app .club-refined-card h2{font-size:26px;line-height:1.12;margin-bottom:6px}
+ .club-app .club-refined-card .club-card-date{font-size:12px;margin-bottom:6px}
+ .club-app .club-refined-card :is(.club-card-meta,.club-card-composer){font-size:12px;line-height:1.4;margin-bottom:4px}
+ .club-app .club-opera-slide .club-refined-card .club-evening-art{height:118px;border-radius:12px}
+ .club-app .club-profile-panel{padding:16px}
+ .club-app .club-profile-panel h2{font-size:24px}
+}
+@media(max-width:600px){
+ .club-app .club-opera-carousel .club-evenings{display:flex;align-items:flex-start}
+ .club-app .club-opera-carousel .club-opera-slide{display:block;flex:0 0 90%;width:90%}
+ .club-app .club-opera-carousel .club-opera-slide .club-refined-card{display:flex;flex-direction:column;align-items:stretch;height:auto;min-height:0}
+ .club-app .club-opera-slide .club-refined-card .club-evening-action{margin:0;align-self:stretch}
+}
+
+/* Give the brand mark prominence over the mobile card headings. */
+@media(max-width:600px){
+ .club-app .club-header.club-unified-header :is(.club-brand,.club-demo-logo){width:224px;height:70px}
+ .club-app .club-header.club-unified-header :is(.club-brand img,img.club-demo-logo){height:70px;object-fit:contain}
+}
+@media(max-width:360px){
+ .club-app .club-header.club-unified-header :is(.club-brand,.club-demo-logo){width:202px;height:64px}
+ .club-app .club-header.club-unified-header :is(.club-brand img,img.club-demo-logo){height:64px}
+}
+@media(max-width:600px){
+ .club-app .club-header.club-unified-header :is(.club-brand img,img.club-demo-logo){object-fit:cover;object-position:center}
+}
+@media(max-width:600px){
+ .club-app .site-header.club-header.club-unified-header{align-items:center}
+ .club-app .club-header.club-unified-header .club-brand{display:flex;align-items:center}
+ .club-app .club-header.club-unified-header :is(.club-brand img,img.club-demo-logo){object-position:center calc(50% + 5px)}
+ .club-app .club-header.club-unified-header .club-mobile-menu-toggle{align-self:center;margin-top:0;margin-bottom:0}
+}
+/* Match the visible mobile brand and Menu control to a single 44px row. */
+@media(max-width:600px){
+ .club-app .club-header.club-unified-header :is(.club-brand,.club-demo-logo){width:180px;height:44px}
+ .club-app .club-header.club-unified-header :is(.club-brand img,img.club-demo-logo){width:180px;height:44px;object-fit:cover;object-position:center}
+ .club-app .club-header.club-unified-header .club-mobile-menu-toggle{height:44px;min-height:44px;align-self:center;margin-block:0}
+}
+@media(max-width:600px){
+ .club-app .club-discovery-filters{align-items:end;column-gap:10px}
+ .club-app .club-discovery-filters>label:first-child{display:flex;flex-direction:column;gap:6px;margin:0}
+ .club-app .club-discovery-filters input[type=search]{height:48px;min-height:48px;margin:0}
+ .club-app button.club-mobile-filters-toggle{height:48px;min-height:48px;box-sizing:border-box;align-self:end;margin:0;line-height:24px;padding:11px 14px;border-radius:24px}
+ .club-app button.club-mobile-filters-toggle:focus:not(:focus-visible){outline:none;box-shadow:none}
+}
+
+/* Self-hosted editorial typography shared by every application surface. */
+@font-face {
+  font-family: 'OH Bodoni Moda';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url(/fonts/bodoni-moda-400-italic.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'OH Bodoni Moda';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(/fonts/bodoni-moda-400-normal.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'OH Bodoni Moda';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(/fonts/bodoni-moda-500-normal.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'OH Geist';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(/fonts/geist-400-normal.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'OH Geist';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(/fonts/geist-500-normal.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'OH Geist';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(/fonts/geist-600-normal.ttf) format('truetype');
+}
+
+:root,body{--font-display:'OH Bodoni Moda';--font-geist-sans:'OH Geist';--display:'OH Bodoni Moda',Georgia,serif;--sans:'OH Geist',Arial,sans-serif}
+.club-app{--display:'OH Bodoni Moda',Georgia,serif;--sans:'OH Geist',Arial,sans-serif;font-family:var(--sans)}
+
+/* Authentication uses the same editorial type hierarchy as member pages. */
+.club-app .club-auth{font:400 14px/1.5 var(--sans)}
+.club-app .club-auth h2{font:400 28px/1.2 var(--display);letter-spacing:-.025em;margin:0 0 14px}
+.club-app .club-auth p{font:400 14px/1.5 var(--sans);margin:12px 0 18px}
+.club-app .club-auth label{font:500 14px/1.5 var(--sans)}
+.club-app .club-auth button:not(.club-auth-close){font:400 14px/24px var(--sans)}
+.club-app .club-auth .club-fine-print{font-size:12px;line-height:1.5}
+@media(max-width:600px){.club-app .club-auth h2{font-size:24px}}
+
+/* Invitation registration follows the same compact form scale as login. */
+.club-app .club-invitation-dialog .club-entry{padding:0;margin:0;max-width:none;border:0}
+.club-app .club-invitation-dialog .club-entry h2{font:500 16px/1.4 var(--sans);letter-spacing:normal;margin:12px 0}
+.club-app .club-invitation-dialog .club-entry p{font:400 14px/1.5 var(--sans);margin:10px 0 14px}
+.club-app .club-invitation-dialog .club-entry :is(label,summary){font:400 14px/1.5 var(--sans)}
+.club-app .club-invitation-dialog .club-entry form{gap:12px;margin-top:12px}
+.club-app .club-invitation-dialog .club-entry button{min-height:44px;padding:9px 14px;font:400 14px/24px var(--sans)}
+.club-app .club-invitation-dialog .club-invitation-fallback{margin-top:16px}
+.club-app .club-invitation-dialog .club-invitation-fallback summary{padding-block:8px;min-height:44px}
+.club-app .club-invitation-dialog input:not([type=checkbox]){height:48px;min-height:48px;padding:11px 16px;font:var(--field-font)}
+:root body .club-app .club-invitation-dialog .club-entry .club-invitation-fallback summary{font:400 14px/1.5 var(--sans);padding-block:8px}

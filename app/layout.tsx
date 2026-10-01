@@ -1,18 +1,5 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono, Bodoni_Moda } from 'next/font/google';
 import './globals.css';
-
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
-});
-
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
-});
-
-const displayFont = Bodoni_Moda({variable: '--font-display', subsets: ['latin'], weight: ['400', '500', '600'], style: ['normal', 'italic'], display: 'swap'});
 
 export const metadata: Metadata = {
   title: 'OH-pera! — Your private opera circle',
@@ -38,7 +25,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${displayFont.variable} antialiased`}
+        className="antialiased"
       >
         {children}
       </body>
