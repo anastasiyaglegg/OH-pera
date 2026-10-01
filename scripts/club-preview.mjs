@@ -37,7 +37,7 @@ for(const [index,row] of [...featured.values()].entries()){
 
 const bundle=await build({entryPoints:[resolve(root,'dev/club-preview.tsx')],bundle:true,write:false,format:'esm',jsx:'automatic',define:{'process.env.NODE_ENV':'"development"'}});
 const js=bundle.outputFiles[0].contents;
-const previewCssPrefix=':root{--font-display:Georgia;--font-geist-sans:Arial}.club-original-hero img.club-static-hero-image{position:absolute;inset:0;width:100%;height:100%}';
+const previewCssPrefix='.club-original-hero img.club-static-hero-image{position:absolute;inset:0;width:100%;height:100%}';
 const allowed=new Set(['calendar','plans','attend','withdraw','inbox','thread','send','mark_read','connections','block','unblock','invitation_list','invite','revoke','invitation_state','remove_invitee','profile_get','profile_save','profile_view']);
 const origins=new Set(['http://localhost:3002','http://127.0.0.1:3002']);
 const server=createServer(async(req,res)=>{
@@ -56,6 +56,7 @@ const server=createServer(async(req,res)=>{
   if(req.method!=='GET'){send(405,'text/plain','Method not allowed');return;}
   if(req.url==='/'){send(200,'text/html','<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>OH-pera Club · Local Demo</title><link rel="stylesheet" href="/club.css"></head><body><div id="root"></div><script type="module" src="/club.js"></script></body></html>');return;}
   if(req.url==='/coverage.json'){send(200,'application/json',JSON.stringify({sources:schedule.sources.map(({id,name,url})=>({id,name,url})),generatedAt:schedule.generatedAt}));return;}
+  if(req.url&&/^\/fonts\/(bodoni-moda|geist)-(400|500|600)-(normal|italic)\.ttf$/.test(req.url)){send(200,'font/ttf',await readFile(resolve(root,'public'+req.url)));return;}
   if(req.url==='/club.js'){send(200,'text/javascript',js);return;}
   if(req.url==='/club.css'){send(200,'text/css',previewCssPrefix+(await readFile(resolve(root,'app/globals.css'),'utf8')).replace("@import 'tailwindcss';",''));return;}
   if(req.url&&/^\/images\/(operas|venues)\/[a-z0-9-]+\.(jpg|png)$/.test(req.url)){send(200,req.url.endsWith('.png')?'image/png':'image/jpeg',await readFile(resolve(root,'public'+req.url)));return;}

@@ -11,7 +11,7 @@ export default function ClubInvitations({api,demo=false}:{api:ClubApi;demo?:bool
  useEffect(()=>{let current=true;void api<InvitationState>('invitation_state').then(next=>{if(current)setState(next);}).catch(()=>{if(current)setError('Could not load your invitation. Please try again.');});return()=>{current=false;};},[api]);
  async function act(task:()=>Promise<void>){setBusy(true);setError('');setMessage('');try{await task();}catch(e){setError(e instanceof Error?e.message:'Please try again.');}finally{setBusy(false);}}
  const current=state?.history.find(item=>item.status==='pending'||item.status==='accepted');
- return <div className="club-invitation-manager"><p>You can invite one person. Once they join, they can invite someone too.</p>{error&&<div role="alert"><p>{error}</p><button disabled={busy} onClick={()=>void act(load)}>Retry loading invitation</button></div>}{message&&<p role="status">{message}</p>}{!state&&!error&&<p role="status">Loading your invitation…</p>}
+ return <div className="club-invitation-manager"><p>Your invitation brings someone you know into the club. Invite one person by email, then share their personal link. Once they join, they can invite someone too.</p>{error&&<div role="alert"><p>{error}</p><button disabled={busy} onClick={()=>void act(load)}>Retry loading invitation</button></div>}{message&&<p role="status">{message}</p>}{!state&&!error&&<p role="status">Loading your invitation…</p>}
 
  <div className="club-member-management-grid"><section className="club-member-management-panel" aria-labelledby="my-invitees-heading"><h2 id="my-invitees-heading">My invitees</h2>
  {state?.available&&<p>You have no current invitees or pending invitations.</p>}
