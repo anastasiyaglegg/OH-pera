@@ -42,7 +42,7 @@ function OperaDetails({performance:p,onClose}:{performance:EventRow['performance
  </dialog>;
 }
 
-function Attendees({row,onMessage}:{row:EventRow;onMessage?: (id:string)=>void}){
+function Attendees({row,onProfile,onToggleCircle,circleOpen}:{row:EventRow;onProfile:(person:Person)=>void;onToggleCircle:()=>void;circleOpen:boolean}){
  const self=row.mine==='going'&&row.total>0;
  const others=Math.max(0,row.total-row.people.length-(self?1:0));
  return <section className="club-attendance" aria-label="Who is going">
@@ -50,10 +50,11 @@ function Attendees({row,onMessage}:{row:EventRow;onMessage?: (id:string)=>void})
   {row.total===0?<p className="club-fine-print">Be the first in the club to make a plan.</p>:<>
    <div className="club-attendees">
     {self&&<span className="club-attendee-self">You</span>}
-    {row.people.map(person=>{const content=<><span aria-hidden="true">{person.display_name.charAt(0)}</span><span className="club-attendee-copy"><strong>{person.display_name}</strong></span></>;return onMessage?<button key={person.id} aria-label={`Message ${person.display_name}`} onClick={()=>onMessage(person.id)}>{content}</button>:<div key={person.id} className="club-attendee-label" title={person.relationship}>{content}</div>;})}
+    {row.people.map(person=>{const content=<><span aria-hidden="true">{person.display_name.charAt(0)}</span><span className="club-attendee-copy"><strong>{person.display_name}</strong></span></>;return <button type="button" key={person.id} aria-label={`View profile of ${person.display_name}`} aria-haspopup="dialog" title={person.relationship} onClick={()=>onProfile(person)}>{content}</button>;})}
    </div>
    {others>0&&<div className="club-anonymous-attendees"><span className="club-anonymous-avatar" aria-hidden="true">+{others}</span><span>{others} other {others===1?'member':'members'} going</span></div>}
   </>}
+  <button type="button" className="club-view-circle" aria-expanded={circleOpen} aria-controls={circleOpen?`inline-plan-${row.performance.id}`:undefined} onClick={onToggleCircle}>{circleOpen?'Close friends’ circle':'View friends’ circle'} <span aria-hidden="true">{circleOpen?'↑':'↓'}</span></button>
  </section>;
 }
 
@@ -84,7 +85,7 @@ function CircleInterest({interests}:{interests:string[]}){
  };
  return <span className="club-circle-interest" role="img" aria-label={`Profile interests: ${interestLabel(interests)}`} title={`Profile interests: ${interestLabel(interests)}`}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{paths[known[0][0]]}</svg>{known.length>1&&<span className="club-circle-interest-more">+{known.length-1}</span>}</span>;
 }
-function AttendingCircle({row,api,onMessage,onProfile}:{row:EventRow;api:ClubApi;onMessage:(id:string)=>void;onProfile:(person:Person)=>void}){
+function AttendingCircle({row,api,onMessage,onProfile,unreadCounts}:{row:EventRow;api:ClubApi;unreadCounts:Record<string,number>;onMessage:(id:string)=>void;onProfile:(person:Person)=>void}){
  const [profiles,setProfiles]=useState<Record<string,ClubProfileData>>({});
  const [ownProfile,setOwnProfile]=useState<ClubProfileData|null>(null);
  const peopleKey=JSON.stringify(row.people.map(person=>person.id));
@@ -98,6 +99,8 @@ function AttendingCircle({row,api,onMessage,onProfile}:{row:EventRow;api:ClubApi
   return()=>{current=false;};
  },[api,peopleKey]);
  const [paused,setPaused]=useState(false);
+ const [listOpen,setListOpen]=useState(false);
+ const orbitPeople=row.people.slice(0,4);
  const [expandedId,setExpandedId]=useState<string|null>(null);
  const [hoveredId,setHoveredId]=useState<string|null>(null);
  const scene=useRef<HTMLDivElement>(null),popover=useRef<HTMLDivElement>(null);
@@ -120,16 +123,18 @@ function AttendingCircle({row,api,onMessage,onProfile}:{row:EventRow;api:ClubApi
  const expanded=row.people.find(person=>person.id===expandedId);
  const self=row.mine==='going'&&row.total>0;
  const others=Math.max(0,row.total-row.people.length-(self?1:0));
- return <section className={`club-attending-circle club-orbiting-circle${paused||expanded||hoveredId?' is-paused':''}`} aria-label={`Friends attending ${row.performance.title}`}>
-  <div className="club-circle-heading"><div><h3>Your circle at this opera</h3><p>{row.total} {row.total===1?'member':'members'} going{self?' · including you':''}</p></div><button className="club-circle-motion" aria-pressed={paused} onClick={()=>setPaused(value=>!value)}>{paused?'Resume motion':'Pause motion'}</button></div>
+ return <section className={`club-attending-circle club-orbiting-circle${row.people.length===0?' is-empty':row.people.length<=2?' is-small-circle':''}${paused||expanded||hoveredId?' is-paused':''}`} aria-label={`Friends attending ${row.performance.title}`}>
+  <div className="club-circle-heading"><div><p>{row.total} {row.total===1?'member':'members'} going{self?' · including you':''}</p></div>{row.people.length>0&&<button className="club-circle-motion" aria-pressed={paused} onClick={()=>setPaused(value=>!value)}>{paused?'Resume motion':'Pause motion'}</button>}</div>
   <div className="club-circle-scene" ref={scene} onKeyDown={event=>{if(event.key==='Escape'){event.stopPropagation();scene.current?.querySelector<HTMLButtonElement>('.club-friend-bubble[aria-expanded="true"]')?.focus();setExpandedId(null);}}}>
-   <div className="club-circle-orbit" aria-hidden="true"/>
-   {self&&<div className="club-circle-you"><span>{ownProfile?.photos[0]?<img className="club-circle-photo" src={ownProfile.photos[0]} alt="Your profile" width={78} height={78}/>:"You"}<CircleInterest interests={ownProfile?.interests||[]}/></span><small>You’re going</small></div>}
-   {row.people.map((person,index)=><div className={`club-orbit-rotor${expandedId===person.id?' is-expanded':''}${hoveredId===person.id?' is-hovered':''}`} key={person.id} style={{'--orbit-start':`${-90+index*360/Math.max(1,row.people.length)}deg`} as CSSProperties}><div className="club-orbit-satellite"><div className="club-orbit-upright"><button className="club-friend-bubble" onPointerEnter={event=>{if(event.pointerType!=='touch')setHoveredId(person.id)}} onPointerLeave={()=>setHoveredId(null)} aria-label={`View ${person.display_name}${profiles[person.id]?.interests.length?` · ${interestLabel(profiles[person.id].interests)}`:''}`} aria-expanded={expandedId===person.id} onClick={()=>setExpandedId(expandedId===person.id?null:person.id)} title={person.relationship}><span className="club-circle-portrait">{profiles[person.id]?.photos[0]?<img className="club-circle-photo" src={profiles[person.id].photos[0]} alt="" width={78} height={78}/>:<span className="club-friend-initial" aria-hidden="true">{person.display_name.charAt(0)}</span>}</span><strong className="club-circle-name">{person.display_name}</strong><CircleInterest interests={profiles[person.id]?.interests||[]}/></button></div></div></div>)}
+   {row.people.length>0&&<div className="club-circle-orbit" aria-hidden="true"/>}
+   {self&&row.people.length>0&&<div className="club-circle-you"><span>{ownProfile?.photos[0]?<img className="club-circle-photo" src={ownProfile.photos[0]} alt="Your profile" width={78} height={78}/>:"You"}<CircleInterest interests={ownProfile?.interests||[]}/></span></div>}
+   {orbitPeople.map((person,index)=><div className={`club-orbit-rotor${expandedId===person.id?' is-expanded':''}${hoveredId===person.id?' is-hovered':''}`} key={person.id} style={{'--orbit-start':`${-90+index*360/Math.max(1,orbitPeople.length)}deg`} as CSSProperties}><div className="club-orbit-satellite"><div className="club-orbit-upright"><button className="club-friend-bubble" onPointerEnter={event=>{if(event.pointerType!=='touch')setHoveredId(person.id)}} onPointerLeave={()=>setHoveredId(null)} aria-label={`View ${person.display_name}${unreadCounts[person.id]>0?` · ${unreadCounts[person.id]} unread ${unreadCounts[person.id]===1?'message':'messages'}`:''}${profiles[person.id]?.interests.length?` · ${interestLabel(profiles[person.id].interests)}`:''}`} aria-expanded={expandedId===person.id} onClick={()=>setExpandedId(expandedId===person.id?null:person.id)} title={person.relationship}><span className="club-circle-portrait">{profiles[person.id]?.photos[0]?<img className="club-circle-photo" src={profiles[person.id].photos[0]} alt="" width={78} height={78}/>:<span className="club-friend-initial" aria-hidden="true">{person.display_name.charAt(0)}</span>}</span><strong className="club-circle-name">{person.display_name}</strong><CircleInterest interests={profiles[person.id]?.interests||[]}/>{unreadCounts[person.id]>0&&<span className="club-circle-unread" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 4h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H9l-5 3v-3a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"/><path d="M7 9h10M7 13h6"/></svg><span>{unreadCounts[person.id]>99?'99+':unreadCounts[person.id]}</span></span>}</button></div></div></div>)}
    {row.people.length===0&&<p className="club-circle-empty">{self?'No one in your circle has joined this opera yet.':'No attending friends to show.'}</p>}
-  {expanded&&<div ref={popover} style={position} className="club-expanded-friend club-friend-popover" role="region" aria-label={`${expanded.display_name} connection`}><div><strong>{expanded.display_name}</strong><p>{expanded.relationship||'Your connection'}</p>{profiles[expanded.id]?.interests.length>0&&<p className="club-circle-interests">Profile interests: {interestLabel(profiles[expanded.id].interests)}</p>}</div><button className="club-collapse-friend" aria-label="Close friend options" onClick={()=>{scene.current?.querySelector<HTMLButtonElement>('.club-friend-bubble[aria-expanded="true"]')?.focus();setExpandedId(null);}}>×</button><div className="club-friend-actions"><button onClick={()=>onProfile(expanded)}>View profile</button><button className="club-primary" onClick={()=>onMessage(expanded.id)}>Start a chat</button></div></div>}
+  {expanded&&<div ref={popover} style={position} className="club-expanded-friend club-friend-popover" role="region" aria-label={`${expanded.display_name} connection`}><div><strong>{expanded.display_name}</strong><p>{expanded.relationship||'Your connection'}</p>{profiles[expanded.id]?.interests.length>0&&<p className="club-circle-interests">Profile interests: {interestLabel(profiles[expanded.id].interests)}</p>}</div><button className="club-collapse-friend" aria-label="Close friend options" onClick={()=>{scene.current?.querySelector<HTMLButtonElement>('.club-friend-bubble[aria-expanded="true"]')?.focus();setExpandedId(null);}}>×</button><div className="club-friend-actions"><button onClick={()=>onProfile(expanded)}>View profile</button><button className="club-primary" onClick={()=>onMessage(expanded.id)}>{unreadCounts[expanded.id]>0?'Read messages':'Start a chat'}</button></div></div>}
   </div>
-  <p className="club-circle-caption">{row.people.length>0?'Select a friend to view their profile or chat. Badges show profile interests, not plans for this performance.':''}{others>0?` ${others} other ${others===1?'member is':'members are'} going · names stay private.`:''}</p>
+  {row.people.length>4&&<button className="club-circle-list-toggle" aria-expanded={listOpen} onClick={()=>setListOpen(value=>!value)}>{listOpen?'Hide friends list':`View all ${row.people.length} friends (+${row.people.length-4})`}</button>}
+  {listOpen&&<ul className="club-circle-member-list">{row.people.map(person=><li key={person.id}><button onClick={()=>onProfile(person)}>{profiles[person.id]?.photos[0]&&<img src={profiles[person.id].photos[0]} alt="" width={36} height={36}/>}<span>{person.display_name}</span><CircleInterest interests={profiles[person.id]?.interests||[]}/></button><button onClick={()=>onMessage(person.id)}>{unreadCounts[person.id]>0?`Read ${unreadCounts[person.id]} messages`:"Chat"}</button></li>)}</ul>}
+  <p className="club-circle-caption">{row.people.length>0?'Select a friend to view their profile or chat.':''}{others>0?` ${others} other ${others===1?'member is':'members are'} going · names stay private.`:''}</p>
  </section>;
 }
 
@@ -147,16 +152,22 @@ function OperaCarousel({children,count,compact=false}:{children:ReactNode;count:
 }
 
 export default function ClubActivity({api,view,onView,onPlansCount}:{api:ClubApi;view:ActivityView;onView:(view:ActivityView)=>void;onPlansCount:(count:number)=>void}){
- const [inboxOpen,setInboxOpen]=useState(false);
  const [filtersOpen,setFiltersOpen]=useState(false);
+ const [goingOnly,setGoingOnly]=useState(false);
  const [profilePerson,setProfilePerson]=useState<Person|null>(null);
  const [selectedOperaId,setSelectedOperaId]=useState('');
+ const [expandedPlanId,setExpandedPlanId]=useState('');
+ const inlinePlan=useRef<HTMLElement>(null);
+ const circleOpener=useRef<HTMLElement|null>(null);
+ useEffect(()=>{if(view==='calendar'&&expandedPlanId){inlinePlan.current?.focus({preventScroll:true});inlinePlan.current?.scrollIntoView({block:'nearest'});}},[expandedPlanId,view]);
+ function closeInlinePlan(id:string){setExpandedPlanId('');(circleOpener.current?.isConnected?circleOpener.current:document.getElementById(`circle-toggle-${id}`))?.focus();}
+ function toggleCircle(id:string){if(expandedPlanId===id){closeInlinePlan(id);return;}circleOpener.current=document.activeElement as HTMLElement|null;setExpandedPlanId(id);}
  const [detail,setDetail]=useState<EventRow['performance']|null>(null);
  const [events,setEvents]=useState<EventRow[]>([]),[contacts,setContacts]=useState<Contact[]>([]),[thread,setThread]=useState<Thread|null>(null);
  const [selected,setSelected]=useState(''),[draft,setDraft]=useState(''),[error,setError]=useState(''),[busy,setBusy]=useState(false),[loading,setLoading]=useState(true),[hasEarlier,setHasEarlier]=useState(false);
  const conversationDialog=useRef<HTMLDialogElement>(null);
  useEffect(()=>{
-  if(!selected||(view!=='plans'&&view!=='messages'))return;
+  if(!selected)return;
   const modal=conversationDialog.current;if(!modal)return;
   const opener=document.activeElement as HTMLElement|null;
   const overflow=document.body.style.overflow;
@@ -166,43 +177,44 @@ export default function ClubActivity({api,view,onView,onPlansCount}:{api:ClubApi
  const [company,setCompany]=useState(''),[query,setQuery]=useState(''),[venue,setVenue]=useState('');
  const [mode,setMode]=useState<'list'|'month'>('list'),[selectedMonth,setMonth]=useState('');
  const filterCount=Number(mode==='month')+Number(Boolean(company))+Number(Boolean(venue));
- function clearFilters(){setQuery('');setCompany('');setVenue('');setMode('list');}
+ function clearFilters(){setGoingOnly(false);setQuery('');setCompany('');setVenue('');setMode('list');}
  const refresh=useCallback(async()=>{
-  const rowsRequest=api<EventRow[]>(view==='plans'?'plans':'calendar');
-  const [rows,people,plans]=await Promise.all([rowsRequest,api<Contact[]>('inbox'),view==='plans'?rowsRequest:api<EventRow[]>('plans')]);
+  const rowsRequest=view==='messages'?Promise.resolve([] as EventRow[]):api<EventRow[]>(view==='plans'?'plans':'calendar');
+  const [rows,people,plans]=await Promise.all([rowsRequest,api<Contact[]>('inbox'),view==='plans'||view==='messages'?rowsRequest:api<EventRow[]>('plans')]);
   setEvents(rows);setContacts(people);onPlansCount(plans.length);
  },[api,view,onPlansCount]);
  useEffect(()=>{let current=true;
-  const load=async()=>{try{const rowsRequest=api<EventRow[]>(view==='plans'?'plans':'calendar');
-  const [rows,people,plans]=await Promise.all([rowsRequest,api<Contact[]>('inbox'),view==='plans'?rowsRequest:api<EventRow[]>('plans')]);if(current){setEvents(rows);setContacts(people);onPlansCount(plans.length);}}catch(e){if(current)setError(e instanceof Error?e.message:'Could not load the club.');}finally{if(current)setLoading(false);}};
+  const load=async()=>{try{const rowsRequest=view==='messages'?Promise.resolve([] as EventRow[]):api<EventRow[]>(view==='plans'?'plans':'calendar');
+  const [rows,people,plans]=await Promise.all([rowsRequest,api<Contact[]>('inbox'),view==='plans'||view==='messages'?rowsRequest:api<EventRow[]>('plans')]);if(current){setEvents(rows);setContacts(people);onPlansCount(plans.length);}}catch(e){if(current)setError(e instanceof Error?e.message:'Could not load the club.');}finally{if(current)setLoading(false);}};
   void load();const timer=setInterval(()=>void load(),15000);return()=>{current=false;clearInterval(timer);};
  },[api,view,onPlansCount]);
- useEffect(()=>{if(!selected||(view!=='messages'&&view!=='plans'))return;let current=true,first=true;
-  const load=async()=>{try{const next=await api<Thread>('thread',{id:selected});if(!current)return;if(first){setHasEarlier(next.messages.length===50);first=false;}setThread(previous=>combineThread(previous,next));const last=next.messages.at(-1);if(last){await api('mark_read',{id:selected,through:last.id});if(current)setContacts(people=>people.map(p=>p.id===selected?{...p,unread:0}:p));}}catch(e){if(current)setError(e instanceof Error?e.message:'Could not load messages.');}};
+ useEffect(()=>{if(!selected)return;let current=true,first=true;
+  const load=async()=>{try{const next=await api<Thread>('thread',{id:selected});if(!current)return;if(first){setHasEarlier(next.messages.length===50);first=false;}setThread(previous=>combineThread(previous,next));const last=next.messages.at(-1);if(last){await api('mark_read',{id:selected,through:last.id});if(current){setContacts(people=>people.map(p=>p.id===selected?{...p,unread:0}:p));window.dispatchEvent(new Event('club-messages-read'));}}}catch(e){if(current)setError(e instanceof Error?e.message:'Could not load messages.');}};
   void load();const timer=setInterval(()=>void load(),10000);return()=>{current=false;clearInterval(timer);};
  },[api,selected,view]);
  async function action(fn:()=>Promise<void>){setBusy(true);setError('');try{await fn();}catch(e){setError(e instanceof Error?e.message:'Please try again.');}finally{setBusy(false);}}
- function openThread(id:string){if(busy)return;if(id===selected)return;setHasEarlier(false);setThread(null);setSelected(id);setDraft('');setError('');if(view!=='plans')onView('plans');}
+ function openThread(id:string){if(busy)return;if(id===selected)return;setHasEarlier(false);setThread(null);setSelected(id);setDraft('');setError('');}
  const month=selectedMonth||events[0]?.performance.date.slice(0,7)||new Date().toISOString().slice(0,7);
  const availableMonths=[...new Set(events.map(row=>row.performance.date.slice(0,7)))].sort();
  const monthOptions=availableMonths.map(value=>({value,label:new Date(`${value}-01T12:00:00`).toLocaleDateString('en-US',{month:'long',year:'numeric'})}));
+ const unreadCounts=Object.fromEntries(contacts.map(person=>[person.id,person.unread]));
  const selectedPerson=contacts.find(p=>p.id===selected);
  const companies=[...new Set(events.map(row=>row.performance.company))].sort();
  const venues=[...new Set(events.map(row=>row.performance.venue).filter(Boolean))].sort();
  const normalize=(value:string)=>value.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
- const matching=events.filter(row=>view==='plans'||((!company||row.performance.company===company)&&(!venue||row.performance.venue===venue)&&normalize(`${row.performance.title} ${row.performance.composer||''}`).includes(normalize(query.trim()))));
+ const matching=events.filter(row=>(!goingOnly||Boolean(row.mine))&&(view==='plans'||((!company||row.performance.company===company)&&(!venue||row.performance.venue===venue)&&normalize(`${row.performance.title} ${row.performance.composer||''}`).includes(normalize(query.trim())))));
  const shown=matching.filter(row=>view==='plans'||mode==='list'||row.performance.date.startsWith(month));
 
+ const expandedPlan=view==='calendar'?shown.find(row=>row.performance.id===expandedPlanId):undefined;
  const today=new Date().toLocaleDateString('en-CA',{timeZone:'America/New_York'});
  const activePlan=shown.find(row=>row.performance.id===selectedOperaId)||shown.find(row=>row.performance.date>=today)||shown[0];
  const needsAttention=events.filter(row=>row.mine==='reconfirm'||row.mine==='cancelled');
  return <section className={`club-activity${view==='calendar'?' club-discover-page':''}${view==='plans'?' club-plans-page club-discover-page':''}`} aria-label="Club activity">
   <div className="club-discovery-content">
-  {view!=='messages'?<header className="club-member-welcome club-calendar-welcome" id="club-results"><div><p className="club-kicker">Your private opera circle · New York</p><h1>{view==='plans'?'Your shared evenings.':'Find your next shared evening.'}</h1><p>{view==='plans'?'Select an opera to see your attending circle, buy tickets, and chat about where to meet.':'Choose an opera and select “I’m going.” Your evening and attending friends will appear in My Plans.'}</p></div></header>:<div className="club-activity-toolbar"><p>Arrange a time and place to meet. This conversation is private between you and your connection.</p></div>}
+  {view!=='messages'?<header className="club-member-welcome club-calendar-welcome" id="club-results"><div><p className="club-kicker">Your private opera circle · New York</p><h1>{view==='plans'?'Your shared evenings.':'Find your next shared evening.'}</h1><p>{view==='plans'?'Select an opera to see your attending circle, buy tickets, and chat about where to meet.':'Select an opera to see your circle. Choose “I’m going” to join them, then arrange your evening together.'}</p></div></header>:null}
   {error&&<div className="club-notice" role="alert"><p>{error}</p><button disabled={busy} onClick={()=>void action(refresh)}>Retry loading</button></div>}
-  {view==='plans'&&<section className="club-conversations-entry"><button aria-expanded={inboxOpen} aria-controls="club-conversation-list" onClick={()=>setInboxOpen(open=>!open)}>Conversations{contacts.reduce((sum,person)=>sum+person.unread,0)>0?` · ${contacts.reduce((sum,person)=>sum+person.unread,0)} unread`:''}</button>{inboxOpen&&<div id="club-conversation-list"><p>Private conversations with your circle, across all your opera plans.</p>{contacts.length===0?<p>No conversations available yet.</p>:contacts.map(person=><button key={person.id} onClick={()=>openThread(person.id)}>{person.display_name}<span>{person.unread?`${person.unread} unread`:person.can_message?'Open conversation':'View past messages'}</span></button>)}</div>}</section>}
   {view!=='messages'&&needsAttention.length>0&&<aside className="club-notice" role="status">{needsAttention.length} of your plans need attention. Review changed or cancelled performances below.</aside>}
-  {view==='calendar'&&<><div className="club-discovery-filters" role="search" aria-label="Find an opera">
+  {view==='calendar'&&<><div className="club-attendance-filter" role="group" aria-label="Attendance filter"><button aria-pressed={!goingOnly} onClick={()=>setGoingOnly(false)}>All operas</button><button aria-pressed={goingOnly} onClick={()=>setGoingOnly(true)}>I’m going <span>{events.filter(row=>Boolean(row.mine)).length}</span></button></div><div className="club-discovery-filters" role="search" aria-label="Find an opera">
    <label>Search operas or composers<input type="search" value={query} onChange={e=>setQuery(e.target.value)} placeholder="Try Macbeth or Mozart"/></label>
    <button type="button" className="club-mobile-filters-toggle" aria-expanded={filtersOpen} aria-controls="club-secondary-filters" onClick={()=>setFiltersOpen(value=>!value)}>{filtersOpen?'Close filters':'Filters'}{filterCount>0?` (${filterCount})`:""}</button>
    <div id="club-secondary-filters" className={`club-secondary-filters${filtersOpen?" is-open":""}`}><ClubFilterSelect label="When" value={mode==='month'?month:''} onChange={value=>{setMode(value?'month':'list');setMonth(value);}} options={[{value:'',label:'Any date'},...monthOptions]}/>
@@ -211,12 +223,13 @@ export default function ClubActivity({api,view,onView,onPlansCount}:{api:ClubApi
   </div>{shown.length>0&&(query||company||venue||mode==='month')&&<button className="club-text club-clear-filters" onClick={clearFilters}>Clear filters</button>}</>}
 
 
+  {view==='messages'&&<section className="club-inbox-list" aria-label="Your conversations"><h2>Messages</h2><p>Select someone in your circle to chat.</p>{loading?<p role="status">Loading conversations…</p>:contacts.length===0?<p>No conversations yet. Invite a friend to start your circle.</p>:<ul>{contacts.map(person=><li key={person.id}><button onClick={()=>openThread(person.id)}><span>{person.display_name}</span><span>{person.unread>0?`${person.unread} unread`:person.can_message?'Open chat':'Read conversation'}</span></button></li>)}</ul>}</section>}
   {view!=='messages'&&<p className="sr-only" role="status" aria-live="polite" aria-atomic="true">{loading?'Loading performances':`${shown.length} matching ${shown.length===1?'performance':'performances'}`}</p>}
-  {view!=='messages'&&(loading?<p role="status">Loading evenings…</p>:shown.length===0?<div className="club-panel"><h2>{view==='plans'?'Your next evening starts here.':'No matching performances.'}</h2><p>{view==='plans'?'Choose an opera in Discover and select “I’m going.”':'Try a different search or clear your filters.'}</p><button onClick={()=>{clearFilters();onView('calendar');}}>{view==='plans'?'Explore operas':'Clear filters'}</button></div>:<OperaCarousel key={`${view}-${mode}-${month}-${company}-${venue}-${query}`} count={shown.length} compact={false}>{shown.map((row,index)=>{const p=row.performance;return <div key={p.id} className="club-opera-slide" role="group" aria-label={`${index+1} of ${shown.length}: ${p.title}`}>
-   <article className={`club-evening club-refined-card${view==='plans'&&activePlan?.performance.id===p.id?' is-selected-plan':''}`}>
+  {view!=='messages'&&(loading?<p role="status">Loading evenings…</p>:shown.length===0?<div className="club-panel"><h2>{view==='plans'?'Your next evening starts here.':'No matching performances.'}</h2><p>{view==='plans'?'Choose an opera in Discover and select “I’m going.”':'Try a different search or clear your filters.'}</p><button onClick={()=>{clearFilters();onView('calendar');}}>{view==='plans'?'Explore operas':'Clear filters'}</button></div>:<OperaCarousel key={`${view}-${mode}-${month}-${company}-${venue}-${query}-${goingOnly}`} count={shown.length} compact={false}>{shown.map((row,index)=>{const p=row.performance;return <div key={p.id} className="club-opera-slide" role="group" aria-label={`${index+1} of ${shown.length}: ${p.title}`}>
+   <article className={`club-evening club-refined-card${(view==='plans'&&activePlan?.performance.id===p.id)||expandedPlanId===p.id?' is-selected-plan':''}`}>
     <div className="club-card-heading">
      <p className="club-card-date">{dateLabel(p.date)} · {timeLabel(p.time)}{p.time?' ET':''}</p>
-     <h2>{view==='plans'?<button className="club-plan-select" aria-label={`Show friends for ${p.title}, ${dateLabel(p.date)}, ${timeLabel(p.time)}`} aria-pressed={activePlan?.performance.id===p.id} aria-controls="selected-opera-circle" onClick={()=>{setSelectedOperaId(p.id);}}>{p.title}</button>:p.title}</h2>
+     <h2>{view==='plans'?<button className="club-plan-select" aria-label={`Show friends for ${p.title}, ${dateLabel(p.date)}, ${timeLabel(p.time)}`} aria-pressed={activePlan?.performance.id===p.id} aria-controls="selected-opera-circle" onClick={()=>{setSelectedOperaId(p.id);}}>{p.title}</button>:<button type="button" id={`circle-toggle-${p.id}`} className="club-circle-select" aria-label={`Show friends attending ${p.title}, ${dateLabel(p.date)}`} aria-expanded={expandedPlanId===p.id} aria-controls={expandedPlanId===p.id?`inline-plan-${p.id}`:undefined} onClick={()=>toggleCircle(p.id)}>{p.title}</button>}</h2>
      <p className="club-card-meta">{p.company} · {p.venue||'Venue to be confirmed'}</p>
      {p.composer&&<p className="club-card-composer">{p.composer}</p>}
      <div className="club-card-labels"><span className="event-kind">{p.kind==='screening'?'Opera screening':p.kind==='concert'?'Concert':'Staged opera'}</span><button className="club-card-details" aria-label={`Opera details for ${p.title}, ${dateLabel(p.date)}`} aria-haspopup="dialog" onClick={()=>setDetail(p)}>Opera details</button></div>
@@ -226,15 +239,25 @@ export default function ClubActivity({api,view,onView,onPlansCount}:{api:ClubApi
      {view==='plans'&&p.ticketUrl&&/^https:\/\//.test(p.ticketUrl)&&p.status!=='cancelled'&&<a className="club-card-buy" href={p.ticketUrl} target="_blank" rel="noopener noreferrer" aria-label={`Buy tickets for ${p.title}, ${dateLabel(p.date)} (opens in a new tab)`}>Buy tickets</a>}
      {row.mine==='going'&&<span className="club-going-status" role="status">✓ You’re going</span>}
      {row.mine==='reconfirm'&&<p role="status">Details changed. Review before reconfirming.</p>}
-     {(row.mine==='cancelled'||p.status==='cancelled')?<strong>Cancelled</strong>:row.mine!=='going'&&<button className="club-primary" disabled={busy} onClick={()=>void action(async()=>{await api('attend',{id:p.id,revision:row.revision});await refresh();})}>{row.mine==='reconfirm'?'Reconfirm attendance':'I’m going'}</button>}
-     {row.mine&&<button className="club-remove-plan" disabled={busy} onClick={()=>void action(async()=>{await api('withdraw',{id:p.id});await refresh();})}>Remove from My Plans</button>}
+     {(row.mine==='cancelled'||p.status==='cancelled')?<strong>Cancelled</strong>:row.mine!=='going'&&<button className="club-primary" disabled={busy} onClick={()=>void action(async()=>{await api('attend',{id:p.id,revision:row.revision});await refresh();if(view==='calendar'){circleOpener.current=document.getElementById(`circle-toggle-${p.id}`);setExpandedPlanId(p.id);}})}>{row.mine==='reconfirm'?'Reconfirm attendance':'I’m going'}</button>}
+     {row.mine&&<button type="button" className="club-remove-plan" disabled={busy} aria-label={`Not going anymore to ${p.title}, ${dateLabel(p.date)}`} onClick={()=>void action(async()=>{await api('withdraw',{id:p.id});await refresh();})}>Not going anymore</button>}
     </div>
     <div className="club-evening-art"><img src={`/images/operas/${artFor(p.title)||'hero'}.jpg`} alt={artFor(p.title)?`Concept illustration inspired by ${p.title}`:'Illustrated opera evening in New York'} loading="lazy" decoding="async" width={1536} height={1024}/></div>
-    {view!=='plans'&&<Attendees row={row}/>}
+    {view!=='plans'&&<Attendees row={row} onProfile={setProfilePerson} circleOpen={expandedPlanId===p.id} onToggleCircle={()=>toggleCircle(p.id)}/>}
    </article>
+
   </div>;})}</OperaCarousel>)}
-  {view==='plans'&&!loading&&activePlan&&<div id="selected-opera-circle"><a className="club-back-to-plans" href="#club-results">Back to your operas</a><div className="club-selected-opera-label" aria-live="polite"><span>Your circle for</span><strong>{activePlan.performance.title}</strong><span>{dateLabel(activePlan.performance.date)} · {timeLabel(activePlan.performance.time)}{activePlan.performance.time?' ET':''}</span></div><AttendingCircle key={activePlan.performance.id} row={activePlan} api={api} onMessage={openThread} onProfile={setProfilePerson}/></div>}
-  {selected&&(view==='plans' ||view==='messages')&&<dialog ref={conversationDialog} className="club-conversation-dialog" aria-labelledby="club-conversation-title" onCancel={()=>setSelected('')}><button className="club-conversation-close" aria-label="Close conversation" onClick={()=>setSelected('')}>×</button><div className="club-chat"><h2 id="club-conversation-title">{selectedPerson?.display_name||'Private conversation'}</h2>{error&&<div><p role="alert">{error}</p><button disabled={busy} onClick={()=>void action(async()=>{const next=await api<Thread>('thread',{id:selected});setThread(previous=>combineThread(previous,next));})}>Reload conversation</button></div>}<div className="club-chat-log" aria-label="Messages">{thread&&hasEarlier&&<button onClick={()=>void action(async()=>{const older=await api<Thread>('thread',{id:selected,before:thread.messages[0].id});setHasEarlier(older.messages.length===50);setThread(previous=>combineThread(previous,older));})}>Load earlier messages</button>}{thread?.messages.map(message=><div key={message.id} className={message.mine?'club-message mine':'club-message'}><small>{message.mine?'You':selectedPerson?.display_name}</small><p>{messageText(message.body)}</p><time dateTime={message.created_at}>{new Date(message.created_at).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})}</time></div>)}{!thread&&<p role="status">Loading conversation…</p>}{thread?.messages.length===0&&<p>No messages yet. Say hello.</p>}</div>{thread?.can_message?<form onSubmit={e=>{e.preventDefault();void action(async()=>{await api('send',{id:selected,body:draft});setDraft('');const next=await api<Thread>('thread',{id:selected});setThread(previous=>combineThread(previous,next));await refresh();});}}><label>Message<textarea value={draft} onChange={e=>setDraft(e.target.value)} maxLength={2000} rows={3} required placeholder="Suggest a time and place to meet…"/></label><div className="club-actions"><button className="club-primary" disabled={busy||!draft.trim()}>Send message</button><span className="club-fine-print">{draft.length}/2000 · No read receipts or online status shared.</span></div></form>:thread&&<p>This conversation is read-only. Existing messages are kept.</p>}</div></dialog>}
+   {expandedPlan&&<section ref={inlinePlan} id={`inline-plan-${expandedPlan.performance.id}`} className="club-inline-plan" tabIndex={-1} aria-labelledby={`inline-plan-heading-${expandedPlan.performance.id}`} onKeyDown={event=>{if(event.key==='Escape'){event.stopPropagation();closeInlinePlan(expandedPlan.performance.id);}}}>
+    <div className="club-inline-plan-heading"><h3 id={`inline-plan-heading-${expandedPlan.performance.id}`}>Your circle · {expandedPlan.performance.title}</h3><button type="button" aria-label={`Close your plan for ${expandedPlan.performance.title}`} onClick={()=>closeInlinePlan(expandedPlan.performance.id)}>×</button></div>
+    <p className="club-circle-performance-date">{dateLabel(expandedPlan.performance.date)} · {timeLabel(expandedPlan.performance.time)}{expandedPlan.performance.time?' ET':''}</p>
+    <AttendingCircle key={expandedPlan.performance.id} row={expandedPlan} api={api} unreadCounts={unreadCounts} onMessage={openThread} onProfile={setProfilePerson}/>
+    <div className="club-inline-plan-actions">
+     {expandedPlan.performance.ticketUrl&&/^https:\/\//.test(expandedPlan.performance.ticketUrl)&&expandedPlan.performance.status!=='cancelled'&&<a className="club-card-buy" href={expandedPlan.performance.ticketUrl} target="_blank" rel="noopener noreferrer">Buy tickets<span className="sr-only"> for {expandedPlan.performance.title} (opens in a new tab)</span></a>}
+     {expandedPlan.mine&&<button type="button" className="club-text" disabled={busy} onClick={()=>void action(async()=>{await api('withdraw',{id:expandedPlan.performance.id});await refresh();setExpandedPlanId('');})}>Not going anymore</button>}
+    </div>
+   </section>}
+  {view==='plans'&&!loading&&activePlan&&<div id="selected-opera-circle"><a className="club-back-to-plans" href="#club-results">Back to your operas</a><div className="club-selected-opera-label" aria-live="polite"><span>Your circle for</span><strong>{activePlan.performance.title}</strong><span>{dateLabel(activePlan.performance.date)} · {timeLabel(activePlan.performance.time)}{activePlan.performance.time?' ET':''}</span></div><AttendingCircle key={activePlan.performance.id} row={activePlan} api={api} unreadCounts={unreadCounts} onMessage={openThread} onProfile={setProfilePerson}/></div>}
+  {selected&&<dialog ref={conversationDialog} className="club-conversation-dialog club-message-dialog" aria-labelledby="club-conversation-title" onCancel={()=>setSelected('')}><button className="club-conversation-close" aria-label="Close conversation" onClick={()=>setSelected('')}>×</button><div className="club-chat"><h2 id="club-conversation-title">{selectedPerson?.display_name||'Private conversation'}</h2>{error&&<div><p role="alert">{error}</p><button disabled={busy} onClick={()=>void action(async()=>{const next=await api<Thread>('thread',{id:selected});setThread(previous=>combineThread(previous,next));})}>Reload conversation</button></div>}<div className="club-chat-log" role="log" aria-live="polite" aria-relevant="additions" aria-label="Messages">{thread&&hasEarlier&&<button onClick={()=>void action(async()=>{const older=await api<Thread>('thread',{id:selected,before:thread.messages[0].id});setHasEarlier(older.messages.length===50);setThread(previous=>combineThread(previous,older));})}>Load earlier messages</button>}{thread?.messages.map(message=><div key={message.id} className={message.mine?'club-message mine':'club-message'}><small>{message.mine?'You':selectedPerson?.display_name}</small><p>{messageText(message.body)}</p><time dateTime={message.created_at}>{new Date(message.created_at).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})}</time></div>)}{!thread&&<p role="status">Loading conversation…</p>}{thread?.messages.length===0&&<p>No messages yet. Say hello.</p>}</div>{thread?.can_message?<form onSubmit={e=>{e.preventDefault();void action(async()=>{await api('send',{id:selected,body:draft});setDraft('');const next=await api<Thread>('thread',{id:selected});setThread(previous=>combineThread(previous,next));await refresh();});}}><label>Message<textarea value={draft} onChange={e=>setDraft(e.target.value)} maxLength={2000} rows={3} required placeholder="Suggest a time and place to meet…"/></label><div className="club-actions"><button className="club-primary" disabled={busy||!draft.trim()}>Send message</button><span className="club-fine-print">{draft.length}/2000 · No read receipts or online status shared.</span></div></form>:thread&&<p>This conversation is read-only. Existing messages are kept.</p>}</div></dialog>}
  {profilePerson&&<FriendProfile person={profilePerson} api={api} onClose={()=>setProfilePerson(null)} onMessage={id=>{setProfilePerson(null);openThread(id);}}/>}
  {detail&&<OperaDetails performance={detail} onClose={()=>setDetail(null)}/>}
  </div></section>;
