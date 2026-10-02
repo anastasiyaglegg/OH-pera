@@ -1075,6 +1075,13 @@ footer .film-credit p,footer .sources-updates>p{font:13px/1.8 var(--sans);color:
 }
 .club-app .club-header.club-unified-header button:hover{background:rgba(255,255,255,.65);border-color:#b89960}
 .club-app .club-header.club-unified-header button[aria-current=page]{background:#806019;color:#fffdf9;border-color:#806019}
+.club-app .club-header .club-account-menu{position:relative;flex:0 0 auto}
+.club-app .club-header .club-account-menu summary{display:flex;align-items:center;gap:8px;min-height:44px;padding:9px 18px;border:1px solid #d6b577;border-radius:999px;background:rgba(255,253,249,.12);color:var(--ink);font:400 14px/24px var(--sans);cursor:pointer;list-style:none}
+.club-app .club-header .club-account-menu summary::-webkit-details-marker{display:none}
+.club-app .club-header .club-account-menu[open] summary{background:#806019;color:#fffdf9;border-color:#806019}
+.club-app .club-header .club-account-menu-options{position:absolute;z-index:20;right:0;top:calc(100% + 8px);display:grid;min-width:210px;padding:8px;border:1px solid #d6b577;border-radius:18px;background:#fffdf9;box-shadow:0 12px 26px #251c2030}
+.club-app .club-header .club-account-menu-options button{width:100%;border:0;border-radius:12px;background:transparent;text-align:left;white-space:nowrap}
+.club-app .club-header .club-account-menu-options button[aria-current=page]{background:#806019;color:#fffdf9}
 @media(max-width:600px){
  .club-app.club-original-landing{--landing-header-height:64px}
  .club-app .site-header.club-header.club-unified-header{top:8px;margin:8px 10px 0;padding:8px 12px;min-height:64px;border-radius:24px;gap:8px;flex-wrap:wrap}
@@ -1082,6 +1089,9 @@ footer .film-credit p,footer .sources-updates>p{font:13px/1.8 var(--sans);color:
  .club-app .club-header.club-unified-header .club-brand img{height:44px}
  .club-app .club-header.club-unified-header nav{width:100%;justify-content:flex-start;gap:6px}
  .club-app .club-header.club-unified-header button{padding:9px 12px;font-size:14px}
+ .club-app .club-header .club-account-menu{width:100%}
+ .club-app .club-header .club-account-menu summary{justify-content:space-between;padding:10px 16px}
+ .club-app .club-header .club-account-menu-options{position:static;min-width:0;margin-top:6px;box-shadow:none}
 }
 
 /* Keep the preview chrome from shifting the shared menu between auth states. */
