@@ -1294,3 +1294,247 @@ footer .film-credit p,footer .sources-updates>p{font:13px/1.8 var(--sans);color:
 .club-app .club-invitation-dialog .club-invitation-fallback summary{padding-block:8px;min-height:44px}
 .club-app .club-invitation-dialog input:not([type=checkbox]){height:48px;min-height:48px;padding:11px 16px;font:var(--field-font)}
 :root body .club-app .club-invitation-dialog .club-entry .club-invitation-fallback summary{font:400 14px/1.5 var(--sans);padding-block:8px}
+
+/* Secondary pages and dialogs share the member interface's visual scale. */
+.club-app {
+ --club-dialog-heading:400 28px/1.2 var(--display);
+ --club-dialog-copy:400 14px/1.6 var(--sans);
+ --club-dialog-border:#b58b35;
+ --club-dialog-surface:#faf7f1;
+}
+.club-app :is(.club-auth,.club-opera-details,.club-conversation-dialog) {
+ box-sizing:border-box;color:var(--ink);background:var(--club-dialog-surface);
+ border:2px solid var(--club-dialog-border);border-radius:26px;
+ max-width:calc(100vw - 32px);max-height:calc(100dvh - 32px);
+ font:var(--club-dialog-copy);overscroll-behavior:contain;
+}
+.club-app .club-auth {width:480px;max-width:calc(100vw - 32px);margin:auto}
+.club-app .club-auth form {width:100%;max-width:none}
+.club-app .club-auth .google-login + .club-text {margin-top:12px}
+.club-app :is(.club-auth,.club-opera-details,.club-conversation-dialog)::backdrop {
+ background:#241b246b;backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);
+}
+.club-app :is(.club-auth,.club-opera-details,.club-conversation-dialog) h2,
+.club-app .club-conversation-dialog .club-chat h2 {
+ font:var(--club-dialog-heading);letter-spacing:-.025em;
+}
+.club-app :is(.club-auth,.club-opera-details,.club-conversation-dialog) :is(p,label,summary),
+.club-app .club-profile-content p {font:var(--club-dialog-copy)}
+.club-app :is(.club-auth-close,.club-detail-close,.club-conversation-close) {
+ display:grid;place-items:center;width:44px;height:44px;min-height:44px;
+ padding:0;top:12px;right:12px;border:1px solid #d4af67;border-radius:50%;
+ background:#fffdf9;color:#65585e;font:400 26px/1 var(--sans);
+}
+.club-app :is(.club-auth,.club-opera-details,.club-conversation-dialog) button:not([class$="-close"]) {
+ font:400 14px/24px var(--sans);min-height:44px;
+}
+.club-app :is(.club-auth,.club-conversation-dialog) :is(input:not([type=checkbox]),textarea,select) {
+ font:var(--field-font);border:1px solid #d4af67;background:#fffdf9;color:var(--ink);
+ border-radius:24px;min-height:48px;padding:11px 16px;box-sizing:border-box;max-width:100%;
+}
+.club-app :is(.club-auth,.club-conversation-dialog) textarea {border-radius:20px;resize:vertical}
+.club-app :is(.club-auth,.club-conversation-dialog) ::placeholder {font:inherit;color:#81767a;opacity:1}
+.club-app .club-auth .google-login {width:100%;border:1px solid #d4af67;border-radius:999px;background:#fffdf9;color:var(--ink)}
+.club-app .club-auth .auth-divider {font:400 12px/1.5 var(--sans);color:#6c6065;margin:16px 0}
+.club-app .club-leave-dialog {padding:24px}
+.club-app .club-leave-dialog .club-actions {gap:10px}
+.club-app .club-secondary-page {max-width:800px;margin:24px auto 48px;padding:28px;background:#fffdf9b3;border:1px solid #d8c7a97a;border-radius:26px}
+.club-app .club-secondary-page h1 {font:400 32px/1.2 var(--display);margin:0 0 24px;letter-spacing:-.025em}
+.club-app .club-secondary-page p {font:400 14px/1.7 var(--sans);margin:0 0 20px}
+.club-app .club-return-link {display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:8px 16px;border:1px solid #d4af67;border-radius:999px;font:400 14px/24px var(--sans);text-decoration:none;color:var(--gold)}
+@media(max-width:600px) {
+ .club-app {--club-dialog-heading:400 24px/1.2 var(--display)}
+ .club-app :is(.club-auth,.club-opera-details,.club-conversation-dialog) {border-radius:22px;max-height:calc(100dvh - 24px)}
+ .club-app .club-auth {padding:64px 18px 20px}
+ .club-app :is(.club-profile-content,.club-leave-dialog) {padding:20px 18px}
+ .club-app .club-secondary-page {margin:16px 12px 28px;padding:20px 18px;border-radius:22px}
+ .club-app .club-secondary-page h1 {font-size:24px;margin-bottom:18px}
+ .club-app .club-return-link {padding:8px 12px;font-size:12px}
+}
+@media(prefers-reduced-transparency:reduce),(prefers-contrast:more) {
+ .club-app .club-secondary-page {background:#fffdf9}
+ .club-app .club-auth {width:480px;max-width:calc(100vw - 32px);margin:auto}
+.club-app .club-auth form {width:100%;max-width:none}
+.club-app .club-auth .google-login + .club-text {margin-top:12px}
+.club-app :is(.club-auth,.club-opera-details,.club-conversation-dialog)::backdrop {backdrop-filter:none;-webkit-backdrop-filter:none}
+}
+
+/* Landing entry actions share a single control size. */
+.club-app.club-original-landing .club-account>button,
+.club-app.club-original-landing .club-hero-entry-actions .club-register-link {
+ box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;
+ min-height:48px;padding:11px 18px;font:400 14px/24px var(--sans);border-radius:999px;
+}
+@media(max-width:600px){
+ .club-app.club-original-landing .club-account>button,
+ .club-app.club-original-landing .club-hero-entry-actions .club-register-link {
+  min-height:44px;padding:9px 14px;font:400 12px/24px var(--sans);
+ }
+}
+/* Equal visual dimensions for both landing-page entry buttons. */
+.club-app.club-original-landing .club-account>button,
+.club-app.club-original-landing .club-hero-entry-actions .club-register-link {width:220px;flex-shrink:0;white-space:nowrap}
+@media(max-width:600px){
+ .club-app.club-original-landing .club-account>button,
+ .club-app.club-original-landing .club-hero-entry-actions .club-register-link {width:180px}
+ .club-app.club-original-landing .club-header.club-unified-header .club-brand {width:min(180px,calc(100% - 188px));min-width:0}
+ .club-app.club-original-landing .club-header.club-unified-header .club-brand img {width:100%;object-fit:contain}
+}
+
+.club-app .club-invitation-code-form {margin-top:18px;width:100%}
+.club-app .club-invitation-code-form input {text-transform:uppercase}
+.club-app .club-invitation-code-form input::placeholder {text-transform:none}
+.club-app .club-invitation-share input {font-family:var(--sans);font-size:14px}
+
+/* Keep mobile invitation entry proportional to the compact member screens. */
+@media(max-width:600px) {
+ .club-app .club-invitation-dialog {width:400px;padding:56px 20px 20px;border-radius:22px}
+ .club-app .club-invitation-dialog #invitation-dialog-title {font-size:22px;line-height:1.2;margin:0 0 12px}
+ .club-app .club-invitation-dialog .club-entry h2 {font-size:14px;line-height:1.4;margin:0 0 8px}
+ .club-app .club-invitation-dialog .club-entry p {font-size:13px;line-height:1.5;margin:8px 0 12px}
+ .club-app .club-invitation-dialog .club-entry form {gap:12px;margin:16px 0 0}
+ .club-app .club-invitation-dialog .club-entry label {font-size:13px;gap:6px}
+ .club-app .club-invitation-dialog input:not([type=checkbox]) {margin:0;height:44px;min-height:44px;padding:9px 14px}
+ .club-app .club-invitation-dialog .club-entry #invitation-code-help {font-size:12px;margin:0;line-height:1.5}
+ .club-app .club-invitation-dialog .club-entry button {font-size:14px;min-height:44px;padding:9px 14px}
+}
+
+/* Labels and empty-field prompts share one scale on every form. */
+.club-app {--field-label-font:400 14px/1.5 var(--sans)}
+:root body .club-app :is(label,.club-filter-label,.club-discovery-filters>label),
+:root body .club-app .club-invitation-dialog .club-entry label {
+ font:var(--field-label-font);letter-spacing:normal;
+}
+:root body .club-app :is(input,textarea)::placeholder,
+:root body .club-app .club-filter-trigger>span[data-placeholder=true] {
+ font:var(--field-label-font);letter-spacing:normal;color:var(--field-muted);opacity:1;
+}
+@media(max-width:600px) {
+ .club-app {--field-label-font:400 13px/1.5 var(--sans)}
+}
+
+/* Compact invitation registration and a shared cream-and-gold birthday picker. */
+.club-app .club-auth.club-registration {width:480px;padding:54px 24px 24px}
+.club-app .club-auth.club-registration h2 {font-size:26px;margin:0 0 10px}
+.club-app .club-auth.club-registration>p {font-size:13px;line-height:1.5;margin:0 0 16px}
+.club-app .club-auth .club-registration-form {display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;margin:16px 0 12px}
+.club-registration-form>* {grid-column:1/-1;min-width:0}
+.club-registration-form>label:has(input[name=firstName]),.club-registration-form>label:has(input[name=lastName]) {grid-column:auto}
+.club-app .club-auth .club-registration-form label {display:block;font-size:13px;line-height:1.4;margin:0}
+.club-app .club-auth .club-registration-form :is(input:not([type=checkbox]),select) {height:44px;min-height:44px;margin:5px 0 0;padding:9px 13px;font-size:16px;line-height:24px;width:100%}
+.club-app .club-auth .club-registration-form input[type=hidden] {display:none}
+.club-app .club-auth .club-registration-form .club-check {display:flex;gap:8px;align-items:center}
+.club-app .club-auth .club-registration-form .club-check input {width:18px;height:18px;min-height:18px;margin:0;flex-shrink:0}
+.club-app .club-auth .club-registration-form p {font-size:12px;margin:0}
+.club-birthday-input {position:relative}
+.club-app .club-auth .club-birthday-input input:not([type=hidden]) {padding-right:48px}
+.club-app .club-auth .club-birthday-input button {position:absolute;right:2px;top:5px;width:42px;height:44px;padding:0;border:0;display:grid;place-items:center;color:#806019}
+.club-birthday-calendar {margin-top:8px;padding:12px;border:1px solid #d4af67;border-radius:18px;background:#fffdf9;box-shadow:0 8px 24px #80601914}
+.club-birthday-controls {display:grid;grid-template-columns:1fr 100px;gap:8px}
+.club-app .club-auth .club-birthday-controls select {margin:0;font-size:14px}
+.club-birthday-navigation {display:flex;align-items:center;justify-content:space-between;font-size:13px;color:#806019;margin:6px 0}
+.club-app .club-auth .club-birthday-navigation button {width:44px;padding:0;border:0;font-size:24px}
+.club-birthday-days {display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px;text-align:center}
+.club-birthday-days>span {font-size:11px;color:#81767a;padding:3px 0}
+.club-app .club-auth .club-birthday-days button {padding:0;border:0;border-radius:50%;min-height:36px;height:36px;font-size:13px;line-height:1}
+.club-app .club-auth .club-birthday-days button:hover:not(:disabled) {background:#f0e6d2;color:#806019}
+.club-app .club-auth .club-birthday-days button[aria-pressed=true] {background:#806019;color:#fff}
+.club-birthday-days button:disabled {opacity:.3}
+.club-app .club-auth .club-birthday-done {display:block;margin:8px auto 0;padding:4px 14px;color:#806019}
+@media(max-width:600px){.club-app .club-auth.club-registration {padding:52px 16px 18px;max-width:calc(100vw - 20px)}.club-app .club-auth.club-registration h2 {font-size:24px}.club-app .club-auth .club-registration-form {gap:10px}}
+
+/* One selector design for registration, profile, calendar and birthday forms. */
+.club-app .club-auth .club-filter-select input[type=hidden] {display:none}
+.club-app .club-auth .club-filter-label {font:400 13px/1.4 var(--sans);letter-spacing:normal;color:var(--ink)}
+.club-app .club-auth .club-filter-trigger {height:44px;min-height:44px;padding:9px 13px;font:400 14px/24px var(--sans);background:#fffdf9}
+.club-app .club-auth .club-filter-options {max-height:220px;border-radius:18px}
+.club-app .club-auth .club-filter-options button {min-height:40px;padding:8px 10px;font:400 14px/20px var(--sans)}
+.club-app .club-auth .club-registration-form>.club-filter-select.is-open .club-filter-options {position:relative;top:auto;margin-top:2px}
+.club-app .club-birthday-controls {grid-template-columns:minmax(0,1fr) 110px;align-items:start}
+.club-app .club-birthday-controls .club-filter-trigger {gap:6px}
+.club-app .club-birthday-controls .club-filter-options {max-height:200px;min-width:110px}
+.club-app .club-birthday-controls .club-filter-options button {white-space:nowrap}
+
+/* Compact form system: shared dimensions, restrained menus, and short dialogs. */
+.club-app {--field-height:44px;--field-radius:18px;--field-label-font:400 13px/1.4 var(--sans)}
+:root body .club-app :is(input:not(:is([type=checkbox],[type=radio],[type=hidden],[type=file])),select,button.club-filter-trigger){height:44px;min-height:44px;padding:9px 13px}
+:root body .club-app textarea {min-height:88px;padding:10px 13px;border-radius:16px}
+.club-app .club-auth,.club-app .club-auth.club-registration {width:440px;padding:48px 22px 20px}
+.club-app .club-auth h2,.club-app .club-auth.club-registration h2 {font-size:24px;line-height:1.2;margin:0 0 10px}
+.club-app .club-auth p {font-size:13px;line-height:1.45;margin:8px 0 12px}
+.club-app .club-auth form {display:grid;gap:12px;margin:14px 0 10px}
+.club-app .club-auth form label {display:grid;gap:5px;font:400 13px/1.4 var(--sans)}
+.club-app .club-auth form input:not([type=checkbox]) {margin:0}
+.club-app .club-auth .club-registration-form {display:grid;grid-template-columns:1fr;gap:12px}
+.club-registration-step {border:0;padding:0;margin:0;min-width:0;display:grid;gap:12px}
+.club-registration-step[hidden] {display:none}
+.club-form-pair {display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+.club-form-actions {display:flex;gap:10px}
+.club-form-actions .club-primary {flex:1}
+.club-app .club-auth .club-form-progress {margin:0;color:#806019;font-size:12px}
+:root body .club-app .club-filter-options {padding:5px;gap:1px;border-radius:14px;max-height:200px}
+:root body .club-app .club-filter-options button {border:0;border-radius:8px;box-shadow:none;min-height:40px;padding:8px 10px;font:400 14px/20px var(--sans)}
+.club-app .club-auth .club-registration-form>.club-filter-select.is-open .club-filter-options {position:absolute;top:calc(100% + 6px);margin:0}
+.club-birthday {position:relative;min-width:0}
+.club-app .club-birthday-input {margin-top:5px}
+.club-app .club-auth .club-birthday-input button {top:0;height:44px}
+.club-birthday-calendar[popover] {position:fixed;inset:50% auto auto 50%;transform:translate(-50%,-50%);width:320px;max-width:calc(100vw - 28px);max-height:calc(100dvh - 32px);overflow:auto;box-sizing:border-box;margin:0;padding:14px;color:var(--ink);font:400 14px/1.4 var(--sans);border:1px solid #c9ad76;border-radius:18px;background:#fffdf9;box-shadow:0 16px 60px #30252a40}
+.club-birthday-calendar[popover]::backdrop {background:#30252a20}
+.club-birthday-calendar:not(:popover-open) {display:none}
+.club-app .club-birthday-calendar .club-filter-trigger {font-size:13px}
+.club-app .club-birthday-calendar .club-filter-label {font-size:12px}
+.club-app .club-birthday-calendar .club-birthday-navigation button {padding:0;width:40px;min-height:36px;border:0}
+.club-app .club-birthday-calendar .club-birthday-days button {padding:0;min-height:34px;height:34px;border:0;border-radius:50%;font-size:13px}
+.club-app .club-birthday-calendar .club-birthday-done {display:block;margin:8px auto 0;min-height:40px;padding:6px 14px}
+.club-app .club-profile-panel {padding:20px;margin-bottom:16px}
+.club-app .club-profile-panel h2 {font-size:24px;margin-bottom:12px}
+.club-app .club-profile-panel label,.club-app .club-profile-panel .club-filter-select,.club-app .club-profile-panel .club-birthday {margin-top:12px}
+.club-app .club-profile-panel .club-birthday label,.club-app .club-profile-panel .club-birthday .club-filter-select {margin-top:0}
+.club-app .club-profile-panel .club-fine-print {font-size:12px;line-height:1.45;margin:5px 0 10px}
+.club-app .club-profile-grid {gap:16px}
+.club-app .club-member-management-grid {grid-template-columns:minmax(0,1.25fr) minmax(280px,.75fr);gap:20px;align-items:start}
+.club-app .club-member-management-panel {padding:20px}
+.club-app .club-member-management-panel h2 {font-size:24px;margin-bottom:14px}
+.club-app .club-member-management-panel form {display:grid;gap:12px;margin:0}
+.club-app .club-member-management-panel form label {display:grid;gap:5px}
+.club-app .club-member-management-panel form p {margin:0;font-size:12px;line-height:1.45}
+.club-app .club-member-management-panel form input {margin:0}
+.club-app .club-discovery-filters {padding:12px;gap:10px}
+.club-app .club-conversation-dialog form {gap:10px}
+.club-app .club-conversation-dialog textarea {min-height:72px}
+@media(max-width:700px){
+ .club-app .club-member-management-grid {grid-template-columns:1fr;gap:14px}
+ .club-app .club-profile-name-row {grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+ .club-app .club-profile-panel,.club-app .club-member-management-panel {padding:16px}
+}
+@media(max-width:600px){
+ .club-app .club-auth,.club-app .club-auth.club-registration {padding:48px 16px 18px;max-width:calc(100vw - 24px)}
+ :root body .club-app input:not([type=checkbox]),:root body .club-app textarea {font-size:16px}
+ .club-app .club-discovery-filters {padding:10px;gap:8px}
+ .club-app .club-discovery-filters input[type=search] {height:44px;min-height:44px}
+}
+
+/* Keep entered text and prompts on the same compact scale. */
+.club-app {--field-font:400 13px/22px var(--sans)}
+:root body .club-app :is(.club-auth,.club-profile-panel,.club-member-management-panel,.club-discovery-filters,.club-chat,.club-conversation-dialog) :is(input:not([type=checkbox]),textarea,select,.club-filter-trigger) {font-size:13px}
+:root body .club-app :is(input,textarea)::placeholder {font-size:13px}
+
+/* Authentication fields: quiet borders, consistent autofill, and aligned actions. */
+:root body .club-app .club-auth form :is(input:not([type=checkbox]),textarea) {
+ border-radius:14px;border:1px solid #cfb47d;background:#fffdf9;
+ padding:10px 13px;box-shadow:none;color:#30252a;line-height:22px;
+}
+:root body .club-app .club-auth form input:not([type=checkbox]):focus {
+ border-color:#806019;outline:2px solid #b58b3540;outline-offset:1px;box-shadow:none;
+}
+:root body .club-app .club-auth input:-webkit-autofill,
+:root body .club-app .club-auth input:-webkit-autofill:hover,
+:root body .club-app .club-auth input:-webkit-autofill:focus {
+ -webkit-box-shadow:0 0 0 1000px #fffdf9 inset;
+ -webkit-text-fill-color:#30252a;caret-color:#30252a;
+}
+:root body .club-app .club-auth input:autofill {background:#fffdf9;color:#30252a}
+.club-app .club-auth .auth-divider {margin:14px 0;font-size:12px}
+.club-app .club-auth>.club-text {display:block;width:100%;margin:8px 0 0;padding:6px 0;min-height:36px;border:0;border-radius:8px;text-align:center;font-size:13px}
+.club-app .club-auth .google-login+.club-text {margin-top:10px}
+.club-app .club-auth>p[role=status] {padding:10px 12px;margin:12px 0 0;border-radius:12px;background:#f1eadc;font-size:12px;line-height:1.5}
