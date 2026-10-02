@@ -22,12 +22,13 @@ export default function ClubInvitations({api,demo=false,focus=null}:{api:ClubApi
  }
  const people=state?.invitees??(state?.invitee?[state.invitee]:[]);
  const pending=state?.history.filter(i=>i.status==='pending')??[];
+ const showInvitees=focus!=='invite',showInviteForm=focus!=='invitees';
  return <div className="club-invitation-manager">
-  <p>Invite people you know into your opera circle. Each person receives their own secret word and can invite others too.</p>
+  {!focus&&<p>Invite people you know into your opera circle. Each person receives their own secret word and can invite others too.</p>}
   {error&&<div role="alert"><p>{error}</p><button disabled={busy} onClick={()=>void act(load)}>Refresh invitations</button></div>}
   {message&&<p role="status">{message}</p>}{!state&&!error&&<p role="status">Loading your invitations…</p>}
   <div className="club-member-management-grid">
-   <section className="club-member-management-panel" aria-labelledby="my-invitees-heading"><h2 id="my-invitees-heading" ref={inviteesHeading} tabIndex={-1}>My invitees</h2>
+   {showInvitees&&<section className="club-member-management-panel" aria-labelledby="my-invitees-heading"><h2 id="my-invitees-heading" ref={inviteesHeading} tabIndex={-1}>My invitees</h2>
     {state&&!people.length&&!pending.length&&<p>You have no current invitees or pending invitations.</p>}
     <ul className="club-invitee-list">
      {people.map(person=><li className="club-invitation-current" key={person.id}><div className="club-invitee-row"><div><h3>{person.display_name}</h3><p>{person.status==='active'?'Joined the club':'Membership paused'}</p></div><details className="club-member-options"><summary>Options for {person.display_name}</summary><div><button onClick={()=>setAction({person,kind:'profile'})}>View profile</button><button onClick={()=>setAction({person,kind:'chat'})}>Start a chat</button><button disabled={busy} onClick={()=>setRemove(person)}>Remove member</button></div></details></div>
@@ -38,8 +39,8 @@ export default function ClubInvitations({api,demo=false,focus=null}:{api:ClubApi
       {replace?.id===invitation.id&&<div className="club-remove-confirmation"><p>Replace the secret word for {invitation.email}? Their old secret word will stop working. Other invitations stay active.</p><div className="club-actions"><button disabled={busy} onClick={()=>void act(async()=>{await api('revoke',{id:invitation.id});setReplace(null);setEmail(invitation.email);await load();await create(invitation.email);})}>Replace secret word</button><button disabled={busy} onClick={()=>setReplace(null)}>Keep existing secret word</button></div></div>}
      </li>)}
     </ul>
-   </section>
-   <section className="club-member-management-panel" aria-labelledby="new-invite-heading"><h2 id="new-invite-heading" ref={newInviteHeading} tabIndex={-1}>Invite a new member</h2><form onSubmit={e=>{e.preventDefault();void act(()=>create(email.trim().toLowerCase()));}}><label>Invitee’s email<input disabled={!state||busy} type="email" value={email} onChange={e=>setEmail(e.target.value)} required maxLength={254} autoComplete="off" placeholder="friend@example.com"/></label><p className="club-fine-print">{demo?'Preview invitations do not send email.':'We’ll email their secret word.'} Only the invited email can accept. Secret words expire in seven days.</p><button className="club-primary" disabled={busy||!state}>{busy?'Sending invitation…':demo?'Create demo invitation':'Send invitation'}</button></form></section>
+   </section>}
+   {showInviteForm&&<section className="club-member-management-panel" aria-labelledby="new-invite-heading"><h2 id="new-invite-heading" ref={newInviteHeading} tabIndex={-1}>Invite a new member</h2><form onSubmit={e=>{e.preventDefault();void act(()=>create(email.trim().toLowerCase()));}}><label>Invitee’s email<input disabled={!state||busy} type="email" value={email} onChange={e=>setEmail(e.target.value)} required maxLength={254} autoComplete="off" placeholder="friend@example.com"/></label><p className="club-fine-print">{demo?'Preview invitations do not send email.':'We’ll email their secret word.'} Only the invited email can accept. Secret words expire in seven days.</p><button className="club-primary" disabled={busy||!state}>{busy?'Sending invitation…':demo?'Create demo invitation':'Send invitation'}</button></form></section>}
   </div>
   {action?.kind==='profile'&&<FriendProfile person={{...action.person,relationship:'Your invitee'}} api={api} onClose={()=>setAction(null)} onMessage={()=>setAction({...action,kind:'chat'})}/>} 
   {action?.kind==='chat'&&<MemberConversation person={action.person} api={api} onClose={()=>setAction(null)}/>} 
