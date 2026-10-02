@@ -2,9 +2,10 @@
 import {useEffect,useId,useRef,useState} from 'react';
 
 type Option={value:string;label:string;placeholder?:boolean};
-export default function ClubFilterSelect({label,value,options,onChange}:{label:string;value:string;options:Option[];onChange:(value:string)=>void}){
+export default function ClubFilterSelect({label,value:controlledValue,defaultValue='',name,options,onChange}:{label:string;value?:string;defaultValue?:string;name?:string;options:Option[];onChange?:(value:string)=>void}){
  const id=useId(),root=useRef<HTMLDivElement>(null),trigger=useRef<HTMLButtonElement>(null),list=useRef<HTMLDivElement>(null);
- const [open,setOpen]=useState(false);
+ const [open,setOpen]=useState(false),[localValue,setLocalValue]=useState(defaultValue);
+ const value=controlledValue??localValue;
  const search=useRef({text:'',at:0});
  const selected=options.find(option=>option.value===value)||options[0];
  useEffect(()=>{
@@ -14,8 +15,9 @@ export default function ClubFilterSelect({label,value,options,onChange}:{label:s
   document.addEventListener('pointerdown',dismiss);
   return()=>document.removeEventListener('pointerdown',dismiss);
  },[open]);
- function choose(next:string){onChange(next);setOpen(false);trigger.current?.focus();}
+ function choose(next:string){setLocalValue(next);onChange?.(next);setOpen(false);trigger.current?.focus();}
  return <div className={`club-filter-select${open?' is-open':''}`} ref={root} onBlur={event=>{if(!event.currentTarget.contains(event.relatedTarget))setOpen(false);}}>
+  {name&&<input type="hidden" name={name} value={value}/>}
   <span id={`${id}-label`} className="club-filter-label">{label}</span>
   <button ref={trigger} type="button" className="club-filter-trigger" aria-labelledby={`${id}-label ${id}-value`} aria-haspopup="listbox" aria-expanded={open} aria-controls={`${id}-options`} onClick={()=>setOpen(current=>!current)} onKeyDown={event=>{if(event.key==='ArrowDown'||event.key==='ArrowUp'){event.preventDefault();setOpen(true);}}}>
    <span id={`${id}-value`} data-placeholder={selected?.placeholder||undefined}>{selected?.label}</span><span className="club-filter-chevron" aria-hidden="true"/>

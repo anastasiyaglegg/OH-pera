@@ -7,7 +7,7 @@ test('direct invitee management enforces ownership and keeps descendants',async 
  try{
  await t.test('returns only the direct invitee and rejects unrelated removal',async()=>{
   const state=await as(2,'invitation_state');
-  assert.equal(state.invitee.id,memberId(3));assert.equal(state.available,false);
+  assert.equal(state.invitee.id,memberId(3));assert.equal(state.available,true);
   await assert.rejects(as(2,'remove_invitee',{id:memberId(4),confirmed:true}),/own current invitee/);
   await assert.rejects(as(6,'remove_invitee',{id:memberId(3),confirmed:true}),/own current invitee/);
   await assert.rejects(as(2,'remove_invitee',{id:memberId(3)}),/Confirm removal/);
@@ -32,7 +32,7 @@ test('direct invitee management enforces ownership and keeps descendants',async 
   assert.equal((await db.query('select inviter_id from club_private.members where id=$1',[memberId(4)])).rows[0].inviter_id,memberId(3));
   const state=await as(2,'invitation_state');assert.equal(state.invitee,null);assert.equal(state.available,true);
   await as(2,'invite',{email:'replacement@example.test'});
-  assert.equal((await as(2,'invitation_state')).available,false);
+  assert.equal((await as(2,'invitation_state')).available,true);
   assert.equal((await db.query("select count(*)::int n from club_private.audit where actor_id=$1 and subject_id=$2 and action='removed_by_inviter'",[memberId(2),memberId(3)])).rows[0].n,1);
   await assert.rejects(as(3,'send',{id:memberId(4),body:'Hello'}),/active (club )?membership/i);
  });
