@@ -669,7 +669,7 @@ footer .film-credit p,footer .sources-updates>p{font:13px/1.8 var(--sans);color:
 .club-opera-slide .club-refined-card .club-evening-art{height:150px;min-height:0;aspect-ratio:auto;border-radius:14px}
 .club-refined-card .club-attendance{padding:0 8px;margin:0}
 .club-refined-card .club-attendance-total{margin:0 0 8px;font-size:13px}
-.club-refined-card .club-attendees{margin:0;gap:6px}
+.club-refined-card .club-attendees{margin:0;padding:4px 0 12px;gap:8px}
 .club-refined-card .club-attendee-label,.club-refined-card .club-attendees button{padding:5px 10px 5px 5px;font-size:12px;min-height:36px}
 .club-refined-card .club-attendees button{min-height:44px}
 .club-refined-card .club-anonymous-attendees{margin:8px 0 0;font-size:12px;gap:6px}
@@ -1548,3 +1548,186 @@ footer .film-credit p,footer .sources-updates>p{font:13px/1.8 var(--sans);color:
 .club-app .club-auth>.club-text {display:block;width:100%;margin:8px 0 0;padding:6px 0;min-height:36px;border:0;border-radius:8px;text-align:center;font-size:13px}
 .club-app .club-auth .google-login+.club-text {margin-top:10px}
 .club-app .club-auth>p[role=status] {padding:10px 12px;margin:12px 0 0;border-radius:12px;background:#f1eadc;font-size:12px;line-height:1.5}
+
+/* Compact shared rows align artwork, actions and attendance across Calendar cards.
+   Bound long headings so one distant entry cannot inflate the entire carousel. */
+.club-app .club-discover-page:not(.club-plans-page) .club-opera-carousel .club-evenings {
+ display:grid;grid-auto-flow:column;grid-auto-columns:clamp(320px,32vw,420px);
+ grid-template-rows:auto auto auto auto;align-items:stretch;gap:10px 16px;
+}
+.club-app .club-discover-page:not(.club-plans-page) .club-opera-slide {
+ display:grid;grid-row:1 / span 4;grid-template-rows:subgrid;min-width:0;width:auto;
+}
+.club-app .club-discover-page:not(.club-plans-page) .club-opera-slide .club-refined-card {
+ display:grid;grid-row:1 / span 4;grid-template-rows:subgrid;align-items:start;
+ min-width:0;box-sizing:border-box;height:auto;min-height:0;margin:0;padding:12px;border-radius:24px;row-gap:10px;
+}
+.club-app .club-discover-page:not(.club-plans-page) .club-refined-card .club-evening-art {
+ grid-row:1;height:130px;margin:0;border-radius:14px;
+}
+.club-app .club-discover-page:not(.club-plans-page) .club-refined-card .club-card-heading {grid-row:2;padding:0 4px}
+.club-app .club-discover-page:not(.club-plans-page) .club-refined-card h2 {
+ font-size:26px;line-height:1.12;margin-bottom:6px;
+ display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;
+}
+.club-app .club-discover-page:not(.club-plans-page) .club-refined-card .club-card-meta {
+ white-space:nowrap;text-overflow:ellipsis;overflow:hidden;
+}
+.club-app .club-discover-page:not(.club-plans-page) .club-refined-card .club-card-composer {
+ display:none;
+}
+.club-app .club-discover-page:not(.club-plans-page) .club-refined-card .club-card-date {margin-bottom:4px}
+.club-app .club-discover-page:not(.club-plans-page) .club-refined-card .club-evening-action {grid-row:3;margin:0;padding:0 4px;gap:4px 10px;align-self:start}
+.club-app .club-discover-page:not(.club-plans-page) .club-refined-card .club-attendance {grid-row:4;margin:0;padding:6px 4px 0}
+@media(max-width:600px) {
+ .club-app .club-discover-page:not(.club-plans-page) .club-opera-carousel .club-evenings {grid-auto-columns:90%;gap:8px 12px}
+ .club-app .club-discover-page:not(.club-plans-page) .club-opera-slide .club-refined-card {padding:10px;row-gap:8px}
+ .club-app .club-discover-page:not(.club-plans-page) .club-refined-card .club-evening-art {height:118px}
+}
+
+/* Secondary performance information remains available in Opera details. */
+.club-app .club-discover-page:not(.club-plans-page) .club-card-heading>.club-fine-print {display:none}
+
+/* Only explicit controls are interactive, never the surrounding opera card. */
+.club-app .club-refined-card :is(.club-card-details,.club-plan-select,.club-card-ticket-link)::after {content:none;display:none}
+.club-app .club-opera-slide .club-refined-card .club-card-details {position:relative}
+.club-app .club-refined-card :is(.club-card-details,.club-plan-select,.club-card-ticket-link):focus-visible {outline:2px solid var(--gold)!important;outline-offset:3px}
+.club-app .club-refined-card:not(.is-selected-plan),
+.club-app .club-refined-card:not(.is-selected-plan):hover {cursor:default;border-color:var(--club-glass-border);box-shadow:var(--club-glass-shadow)}
+.club-app .club-refined-card:hover .club-evening-art img {transform:none}
+.club-app .club-refined-card :is(.club-card-details,.club-plan-select,.club-card-ticket-link):hover {text-decoration:underline;text-underline-offset:4px}
+
+/* The selected opera’s animated circle opens below the carousel. */
+.club-inline-plan {scroll-margin-top:120px;margin-top:16px;min-width:0;padding:14px;background:#faf6ed;border:1px solid #d4af67;border-radius:20px;color:var(--ink)}
+.club-inline-plan:focus-visible {outline:2px solid var(--gold);outline-offset:2px}
+.club-inline-plan-heading {display:flex;align-items:center;justify-content:space-between;gap:12px}
+.club-inline-plan-heading h3 {margin:0;font:400 24px/1.2 var(--display)}
+.club-app .club-inline-plan-heading button {width:44px;height:44px;min-height:44px;padding:0;font-size:24px;background:transparent}
+.club-inline-plan>.club-fine-print {margin:4px 0 12px;font-size:12px;line-height:1.5}
+.club-inline-plan .club-attendance {margin:0;padding:10px 0 0}
+.club-inline-plan .club-attendance-total {font-size:13px;margin:0 0 8px}
+.club-inline-plan .club-attendees {margin:0;gap:6px}
+.club-inline-plan-actions {display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;margin-top:12px}
+.club-inline-plan-actions :is(a,button) {display:inline-flex;align-items:center;min-height:44px;font-size:13px}
+
+.club-inline-plan .club-attending-circle {margin:8px 0 0}
+
+/* Calendar card activation opens friends; explicit controls remain independent. */
+.club-app .club-opera-slide .club-refined-card button.club-circle-select {
+ position:static;display:block;z-index:auto;width:100%;min-height:0;margin:0;padding:0;
+ border:0;border-radius:0;background:transparent;box-shadow:none;color:inherit;font:inherit;text-align:left;letter-spacing:inherit;
+}
+.club-circle-select::after {content:'';position:absolute;inset:0;z-index:1;border-radius:24px;cursor:pointer}
+.club-app .club-refined-card .club-circle-select:focus-visible {outline:none}
+.club-circle-select:focus-visible::after {outline:2px solid var(--gold);outline-offset:-3px}
+.club-app .club-refined-card :is(.club-card-details,.club-evening-action,.club-attendees) {position:relative;z-index:2}
+.club-app .club-refined-card:has(.club-circle-select:hover) {border-color:var(--gold)}
+
+/* Unread messages sit opposite the profile-interest badge. */
+.club-app .club-friend-bubble .club-circle-unread {position:absolute;top:-7px;right:-10px;z-index:3;display:flex;align-items:center;justify-content:center;gap:3px;min-width:32px;height:27px;padding:0 6px;box-sizing:border-box;border:2px solid #fffdf9;border-radius:999px;background:#78233f;color:#fff;box-shadow:0 2px 6px #30252a26;pointer-events:none;font:600 11px/1 var(--sans)}
+.club-circle-unread svg {width:14px;height:14px;flex-shrink:0}
+
+.club-app .club-refined-card button.club-view-circle {position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-height:44px;margin:8px 0 0;padding:8px 0;border:0;border-top:1px solid #ded4c7;border-radius:0;background:transparent;box-shadow:none;color:var(--gold);font:500 13px/20px var(--sans);text-align:left}
+.club-app .club-refined-card button.club-view-circle:hover {text-decoration:underline;text-underline-offset:4px;background:transparent}
+
+/* Compact conversation window; profile and other dialogs retain their sizing. */
+.club-app .club-message-dialog {width:440px;max-width:calc(100vw - 24px);max-height:calc(100dvh - 24px);border-radius:22px}
+.club-app .club-message-dialog .club-chat {padding:16px}
+.club-app .club-message-dialog .club-chat h2 {font:400 25px/1.2 var(--display);margin:0 0 8px;padding:0 48px 8px 0;min-height:44px}
+.club-app .club-message-dialog .club-chat-log {max-height:28dvh;gap:8px;padding:4px 0 12px}
+.club-app .club-message-dialog .club-message {padding:8px 12px;max-width:85%;border-radius:14px 14px 14px 3px}
+.club-app .club-message-dialog .club-message.mine {border-radius:14px 14px 3px 14px}
+.club-app .club-message-dialog .club-message p {font:400 13px/1.45 var(--sans);margin:3px 0}
+.club-app .club-message-dialog .club-message :is(small,time) {font:400 10px/1.4 var(--sans)}
+.club-app .club-message-dialog form label {font:400 12px/1.4 var(--sans)}
+:root body .club-app .club-message-dialog textarea {height:60px;min-height:60px;padding:9px 12px;border-radius:14px;margin-top:5px}
+.club-app .club-message-dialog .club-actions {gap:8px;flex-wrap:wrap;margin-top:0}
+.club-app .club-message-dialog .club-actions .club-fine-print {font:400 10px/1.4 var(--sans)}
+.club-app .club-message-dialog .club-actions button {font:400 13px/20px var(--sans);min-height:44px;padding:8px 14px}
+
+/* A compact, centered friends-circle panel rather than a full-width section. */
+.club-app .club-inline-plan {width:100%;max-width:640px;box-sizing:border-box;margin:16px auto 0;padding:14px;border-radius:22px}
+.club-app .club-inline-plan-heading h3 {font-size:22px;line-height:1.25}
+.club-app .club-inline-plan .club-attending-circle {margin:4px 0 0;padding:8px 6px;border:0;border-radius:16px}
+.club-app .club-inline-plan .club-circle-heading {align-items:center}
+.club-app .club-inline-plan .club-circle-heading p {font-size:12px}
+.club-app .club-inline-plan .club-circle-scene {--orbit-radius:86px;height:310px;max-width:440px}
+.club-app .club-inline-plan .club-orbit-satellite {width:64px;height:64px}
+.club-app .club-inline-plan .club-friend-bubble {width:64px;height:64px;min-height:64px}
+.club-app .club-inline-plan .club-circle-caption {margin:0;font-size:11px;line-height:1.5}
+.club-app .club-inline-plan-actions {margin-top:8px}
+@media(max-width:600px) {
+ .club-app .club-inline-plan {padding:12px}
+ .club-app .club-inline-plan-heading h3 {font-size:20px}
+ .club-app .club-inline-plan .club-circle-scene {--orbit-radius:76px;height:290px}
+}
+
+/* Audit: compact spacing with readable controls and a stable card footer. */
+.club-app .site-header.club-header.club-unified-header {padding:4px 18px;min-height:60px;gap:10px}
+.club-app .site-header.club-header.club-unified-header.is-scrolled {top:0;margin-top:0;border-radius:0 0 20px 20px}
+.club-app .club-header.club-unified-header :is(.club-brand,.club-demo-logo) {width:180px;height:48px}
+.club-app .club-header.club-unified-header :is(.club-brand img,img.club-demo-logo) {height:48px;object-fit:contain;object-position:center}
+.club-app .club-header.club-unified-header button.club-message-launcher {position:relative;display:grid;place-items:center;order:3;width:44px;height:44px;min-width:44px;min-height:44px;padding:10px;margin:0}
+.club-message-launcher svg {width:22px;height:22px}
+.club-message-launcher>span {position:absolute;right:-5px;top:-5px;background:#78233f;color:white;border:2px solid #fffdf9;border-radius:20px;padding:2px 5px;font:600 12px/1.2 var(--sans)}
+.club-attendance-filter {display:flex;gap:6px;margin:12px 0}
+.club-app .club-attendance-filter button {min-height:44px;padding:8px 14px;font-size:14px}
+.club-app .club-attendance-filter button[aria-pressed=true] {background:var(--gold);color:#fffdf9}
+.club-app .club-discover-page:not(.club-plans-page) .club-refined-card .club-attendance {align-self:stretch;display:flex;flex-direction:column}
+.club-app .club-refined-card button.club-view-circle {margin-top:auto}
+.club-app .club-refined-card .club-anonymous-attendees {margin-bottom:8px}
+.club-app .club-refined-card.is-selected-plan {border-color:var(--gold);box-shadow:inset 0 0 0 1px var(--gold)}
+.club-app .club-inline-plan {max-width:560px;scroll-margin-top:80px;padding:12px}
+.club-app .club-inline-plan-heading h3 {font-size:21px}
+.club-circle-performance-date {font:400 13px/1.5 var(--sans);color:#65585e;margin:2px 48px 8px 0}
+.club-app .club-inline-plan .club-circle-scene {height:270px;max-width:360px;--orbit-radius:84px}
+.club-app .club-inline-plan .is-small-circle .club-circle-scene {height:260px;--orbit-radius:84px}
+.club-app .club-inline-plan .is-empty .club-circle-scene {height:auto;min-height:0;padding:12px 0}
+.club-app .is-empty .club-circle-empty {position:static;margin:0;text-align:left;font-size:14px}
+.club-app .club-inline-plan .club-circle-caption {font-size:12px}
+.club-app .club-circle-heading {gap:8px}
+.club-app .club-circle-list-toggle {display:block;margin:8px auto;min-height:44px;font-size:13px}
+.club-circle-member-list {padding:0;margin:8px 0;list-style:none;max-height:280px;overflow:auto}
+.club-circle-member-list li {display:flex;gap:8px;align-items:center;border-top:1px solid var(--line);padding:6px 0}
+.club-app .club-circle-member-list button {display:flex;align-items:center;gap:8px;min-height:44px;padding:6px 10px;font-size:14px}
+.club-circle-member-list li>button:first-child {flex:1;min-width:0;text-align:left;border:0;background:transparent}
+.club-circle-member-list img {border-radius:50%;object-fit:cover}
+.club-circle-member-list .club-circle-interest {position:relative;inset:auto;flex-shrink:0}
+.club-app .club-inbox-list {max-width:520px;margin:16px auto;padding:20px;background:#fffdf9;border:1px solid #d4af67;border-radius:22px}
+.club-inbox-list h2 {font:400 26px/1.2 var(--display);margin:0 0 8px}
+.club-inbox-list ul {list-style:none;margin:16px 0;padding:0}
+.club-app .club-inbox-list li button {display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;min-height:52px;border:0;border-bottom:1px solid var(--line);border-radius:0;text-align:left;padding:10px 0;font-size:14px;background:transparent}
+.club-inbox-list li button span:last-child {color:var(--gold);font-size:12px}
+.club-app .club-message-dialog .club-message p {font-size:14px}
+.club-app .club-message-dialog .club-message :is(small,time),.club-app .club-message-dialog .club-actions .club-fine-print {font-size:12px}
+@media(max-width:1024px) {
+ .club-app .club-header.club-unified-header .club-mobile-menu-toggle {margin-left:auto;order:1}
+ .club-app .club-header.club-unified-header button.club-message-launcher {order:1}
+ .club-app .club-header.club-unified-header nav.club-demo-nav {order:2}
+}
+@media(max-width:600px) {
+ .club-app .site-header.club-header.club-unified-header {padding:4px 10px;gap:6px}
+ .club-app .club-header.club-unified-header :is(.club-brand,.club-demo-logo) {width:150px;height:44px}
+ .club-app .club-header.club-unified-header :is(.club-brand img,img.club-demo-logo) {width:150px;height:44px;object-fit:cover}
+ :root body .club-app :is(input,textarea,select),:root body .club-app input::placeholder,:root body .club-app textarea::placeholder {font-size:16px!important}
+ .club-app .club-inline-plan .club-circle-scene {height:270px;--orbit-radius:78px}
+ .club-app .club-inline-plan .is-small-circle .club-circle-scene {height:250px;--orbit-radius:80px}
+ .club-app .club-inline-plan .is-empty .club-circle-scene {height:auto}
+ .club-app .club-inbox-list {padding:14px}
+}
+.club-app .club-access-status {max-width:560px;margin:20px auto;padding:20px;background:#fffdf9;border:1px solid #d4af67;border-radius:20px}
+.club-access-status h2 {font:400 26px/1.25 var(--display);margin:0 0 10px}
+.club-access-status p {font-size:14px;line-height:1.5;overflow-wrap:anywhere}
+@media(max-width:360px) {
+ .club-app .club-header.club-unified-header :is(.club-brand,.club-demo-logo),
+ .club-app .club-header.club-unified-header :is(.club-brand img,img.club-demo-logo) {width:120px}
+}
+
+/* Messages remain an overlay, preserving the page and its current position. */
+.club-app .club-inbox-dialog {position:fixed;box-sizing:border-box;width:400px;max-width:calc(100vw - 24px);max-height:calc(100dvh - 32px);margin:auto;padding:0;overflow:auto;border:1px solid #d4af67;border-radius:22px;background:#fffdf9;color:var(--ink);box-shadow:0 20px 70px #30252a30}
+.club-inbox-dialog::backdrop {background:#30252a55;backdrop-filter:blur(3px)}
+.club-app .club-inbox-dialog .club-discovery-content {margin:0;padding:0}
+.club-app .club-inbox-dialog .club-inbox-list {margin:0;padding:20px;border:0;border-radius:0;max-width:none}
+.club-app .club-inbox-dialog .club-inbox-list h2 {padding-right:48px;min-height:44px;margin:0;font-size:25px}
+.club-app .club-inbox-dialog .club-inbox-list>p {font-size:14px;line-height:1.5;margin:8px 0}
+.club-app .club-inbox-dialog .club-inbox-list ul {margin:8px 0 0;max-height:50dvh;overflow:auto}
