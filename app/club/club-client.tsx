@@ -154,7 +154,7 @@ export default function ClubClient(){
    </>}
    {message&&!invitationOpen&&!authOpen&&<p className="club-notice" role="status">{message}</p>}
   </main>
-  <footer className="club-footer"><span>OH-pera · An evening, a connection.</span><Link href="/privacy">Privacy &amp; membership</Link></footer>
+  <footer className="club-footer"><span>OH-pera · An evening, a connection.</span><Link href="/privacy">Privacy &amp; membership</Link><span>© 2026 Ivaylo Nanev and Anastasiya Glegg. All rights reserved.</span></footer>
   <dialog ref={dialog} className={`club-auth ${authMode==='create'?'club-registration':''}`} aria-labelledby="club-auth-title" onCancel={()=>setAuthOpen(false)}>
    <button className="club-auth-close" onClick={()=>setAuthOpen(false)} aria-label="Close account window">×</button>
    <h2 id="club-auth-title">{!supabaseConfigured()?'A preview of your club.':authMode==='create'?'Your invitation starts here.':authMode==='forgot'?'Reset your password.':authMode==='reset'?'Choose a new password.':'Welcome back.'}</h2>
