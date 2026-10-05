@@ -1,11 +1,15 @@
 'use client';
-import {useEffect,useRef,useState} from 'react';
+import {useEffect,useId,useRef,useState} from 'react';
 import type {ClubApi} from './club-activity';
+import {useConversationScroll} from './use-conversation-scroll';
+import {submitMessageOnEnter} from './submit-message-on-enter';
 type Message={id:string;mine:boolean;body:string;created_at:string};
 type Thread={messages:Message[];can_message:boolean};
 export default function MemberConversation({person,api,onClose}:{person:{id:string;display_name:string};api:ClubApi;onClose:()=>void}){
  const modal=useRef<HTMLDialogElement>(null);
  const [thread,setThread]=useState<Thread|null>(null),[draft,setDraft]=useState(''),[error,setError]=useState(''),[busy,setBusy]=useState(false),[earlier,setEarlier]=useState(false);
+ const keyboardHintId=useId();
+ const {logRef,onScroll,scrollAfterSend,preserveBeforePrepend}=useConversationScroll(person.id,thread?.messages);
  useEffect(()=>{
   const dialog=modal.current!,opener=document.activeElement as HTMLElement|null,overflow=document.body.style.overflow;
   dialog.showModal();document.body.style.overflow='hidden';let active=true,first=true;
@@ -21,12 +25,12 @@ export default function MemberConversation({person,api,onClose}:{person:{id:stri
  return <dialog ref={modal} className="club-conversation-dialog" aria-labelledby="member-chat-title" onCancel={onClose}>
   <button className="club-conversation-close" aria-label="Close conversation" onClick={onClose}>×</button>
   <div className="club-chat"><h2 id="member-chat-title">{person.display_name}</h2>{error&&<p role="alert">{error}</p>}
-   <div className="club-chat-log" aria-label="Messages">
-    {earlier&&thread&&<button disabled={busy} onClick={()=>void act(async()=>{const next=await api<Thread>('thread',{id:person.id,before:thread.messages[0].id});setEarlier(next.messages.length===50);setThread(previous=>previous?{...previous,messages:[...next.messages.filter(m=>!previous.messages.some(p=>p.id===m.id)),...previous.messages]}:next);})}>Load earlier messages</button>}
+   <div ref={logRef} onScroll={onScroll} className="club-chat-log" role="log" aria-live="polite" aria-relevant="additions" aria-label="Messages">
+    {earlier&&thread&&<button disabled={busy} onClick={()=>void act(async()=>{const next=await api<Thread>('thread',{id:person.id,before:thread.messages[0].id});preserveBeforePrepend();setEarlier(next.messages.length===50);setThread(previous=>previous?{...previous,messages:[...next.messages.filter(m=>!previous.messages.some(p=>p.id===m.id)),...previous.messages]}:next);})}>Load earlier messages</button>}
     {!thread&&!error&&<p role="status">Loading conversation…</p>}{thread?.messages.length===0&&<p>No messages yet. Say hello.</p>}
     {thread?.messages.map(m=><div key={m.id} className={m.mine?'club-message mine':'club-message'}><small>{m.mine?'You':person.display_name}</small><p>{m.body}</p><time dateTime={m.created_at}>{new Date(m.created_at).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})}</time></div>)}
    </div>
-   {thread?.can_message?<form onSubmit={event=>{event.preventDefault();void act(async()=>{await api('send',{id:person.id,body:draft});setDraft('');const next=await api<Thread>('thread',{id:person.id});setThread(previous=>{const messages=new Map((previous?.messages||[]).map(m=>[m.id,m]));next.messages.forEach(m=>messages.set(m.id,m));return {...next,messages:[...messages.values()].sort((a,b)=>BigInt(a.id)<BigInt(b.id)?-1:1)};});});}}><label>Message<textarea value={draft} onChange={event=>setDraft(event.target.value)} maxLength={2000} rows={3} required placeholder="Suggest a time and place to meet…"/></label><button className="club-primary" disabled={busy||!draft.trim()}>Send message</button></form>:thread&&<p>This conversation is read-only. Existing messages are kept.</p>}
+   {thread?.can_message?<form onSubmit={event=>{event.preventDefault();if(busy||!draft.trim()||!thread?.can_message)return;void act(async()=>{await api('send',{id:person.id,body:draft});setDraft(current=>current===draft?'':current);const next=await api<Thread>('thread',{id:person.id});scrollAfterSend();setThread(previous=>{const messages=new Map((previous?.messages||[]).map(m=>[m.id,m]));next.messages.forEach(m=>messages.set(m.id,m));return {...next,messages:[...messages.values()].sort((a,b)=>BigInt(a.id)<BigInt(b.id)?-1:1)};});});}}><label>Message<textarea enterKeyHint="send" aria-describedby={keyboardHintId} onKeyDown={event=>submitMessageOnEnter(event,busy)} value={draft} onChange={event=>setDraft(event.target.value)} maxLength={2000} rows={3} required placeholder="Suggest a time and place to meet…"/></label><p id={keyboardHintId} className="club-chat-keyboard-hint">Return to send · Shift + Return for a new line.</p><button className="club-primary" disabled={busy||!draft.trim()}>Send message</button></form>:thread&&<p>This conversation is read-only. Existing messages are kept.</p>}
   </div>
  </dialog>;
 }

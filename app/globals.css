@@ -851,7 +851,7 @@ footer .film-credit p,footer .sources-updates>p{font:13px/1.8 var(--sans);color:
 .club-conversation-dialog .club-chat{border:0;background:transparent;box-shadow:none;padding:24px}
 .club-conversation-dialog .club-chat h2{padding-right:52px;min-height:44px;display:flex;align-items:center;font:500 16px/1.5 var(--sans)}
 .club-app .club-conversation-close{position:absolute;top:14px;right:14px;width:44px;height:44px;min-height:44px;padding:0;font-size:26px;color:#806019;background:#fffdf9}
-.club-conversation-dialog .club-chat-log{max-height:35dvh}
+.club-conversation-dialog .club-chat-log{max-height:35dvh;overflow-anchor:none;overscroll-behavior:contain}
 @media(max-width:600px){.club-conversation-dialog .club-chat{padding:18px}.club-conversation-dialog .club-actions{gap:10px;flex-wrap:wrap}}
 
 /* Select a planned opera to update the one shared attending circle. */
@@ -1079,8 +1079,8 @@ footer .film-credit p,footer .sources-updates>p{font:13px/1.8 var(--sans);color:
 .club-app .club-header .club-account-menu summary{display:flex;align-items:center;gap:8px;min-height:44px;padding:9px 18px;border:1px solid #d6b577;border-radius:999px;background:rgba(255,253,249,.12);color:var(--ink);font:400 14px/24px var(--sans);cursor:pointer;list-style:none}
 .club-app .club-header .club-account-menu summary::-webkit-details-marker{display:none}
 .club-app .club-header .club-account-menu[open] summary{background:#806019;color:#fffdf9;border-color:#806019}
-.club-app .club-header .club-account-menu-options{position:absolute;z-index:20;right:0;top:calc(100% + 8px);display:grid;min-width:210px;padding:8px;border:1px solid #d6b577;border-radius:18px;background:#fffdf9;box-shadow:0 12px 26px #251c2030}
-.club-app .club-header .club-account-menu-options button{width:100%;border:0;border-radius:12px;background:transparent;text-align:left;white-space:nowrap}
+.club-app .club-header .club-account-menu-options{position:absolute;z-index:20;right:0;top:calc(100% + 8px);display:grid;min-width:210px;padding:8px;border:1px solid #d6b577;border-radius:22px;background:#fffdf9;box-shadow:0 12px 26px #251c2030}
+.club-app .club-header .club-account-menu-options button{width:100%;border:0;border-radius:999px;background:transparent;text-align:left;white-space:nowrap}
 .club-app .club-header .club-account-menu-options button[aria-current=page]{background:#806019;color:#fffdf9}
 @media(max-width:600px){
  .club-app.club-original-landing{--landing-header-height:64px}
@@ -1104,9 +1104,16 @@ footer .film-credit p,footer .sources-updates>p{font:13px/1.8 var(--sans);color:
 .club-circle-photo{display:block;width:100%;height:100%;object-fit:cover;border-radius:50%}
 .club-friend-bubble .club-circle-name{position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:7px;max-width:110px;padding:2px 7px;border-radius:10px;background:#fffdf9e6;color:#453529;font:400 12px/18px var(--sans)}
 .club-circle-you>span{position:relative}
-.club-circle-interest{position:absolute;right:-3px;bottom:-3px;display:grid;place-items:center;width:26px;height:26px;border:1px solid #c8a454;border-radius:50%;background:#fffdf9;color:#806019;box-shadow:0 2px 6px #45352918}
-.club-circle-interest svg{width:16px;height:16px}
-.club-circle-interest-more{position:absolute;left:19px;top:-5px;min-width:17px;border:1px solid #d6b577;border-radius:999px;padding:0 3px;background:#fffdf9;font:500 9px/15px var(--sans)}
+.club-circle-interest{position:absolute;inset:0;pointer-events:none}
+.club-circle-interest-icon{position:absolute;left:var(--interest-x);top:var(--interest-y);transform:translate(-50%,-50%);display:grid;place-items:center;box-sizing:border-box;width:24px;height:24px;border:1px solid #c8a454;border-radius:50%;background:#fffdf9;color:#806019;box-shadow:0 2px 6px #45352918;pointer-events:auto}
+.club-circle-interest svg{display:block;width:16px;height:16px}
+.club-friend-bubble:has(.club-circle-interest) .club-circle-name{margin-top:24px}
+/* Scale the orbit and portraits together so complete badge sets do not collide. */
+.club-app .club-inline-plan .club-circle-scene{container-type:inline-size}
+.club-app .club-inline-plan .club-circle-scene:has(.club-friend-bubble .club-circle-interest){--orbit-radius:min(110px,33cqw);min-height:380px}
+.club-app .club-inline-plan .club-circle-scene:has(.club-friend-bubble .club-circle-interest) :is(.club-orbit-satellite,.club-friend-bubble,.club-circle-you>span){width:clamp(48px,18cqw,64px);height:clamp(48px,18cqw,64px);min-height:clamp(48px,18cqw,64px)}
+.club-app .club-inline-plan .club-circle-scene:has(.club-friend-bubble .club-circle-interest) .club-circle-interest-icon{width:clamp(18px,6.5cqw,24px);height:clamp(18px,6.5cqw,24px)}
+.club-app .club-inline-plan .club-circle-scene:has(.club-friend-bubble .club-circle-interest) .club-circle-interest-icon svg{width:clamp(12px,4.5cqw,16px);height:clamp(12px,4.5cqw,16px)}
 .club-circle-you small{margin-top:14px}
 .club-friend-popover .club-circle-interests{font-size:12px;line-height:1.5;color:#806019}
 
@@ -1437,8 +1444,6 @@ footer .film-credit p,footer .sources-updates>p{font:13px/1.8 var(--sans);color:
 .club-app .club-auth .club-registration-form .club-check input {width:18px;height:18px;min-height:18px;margin:0;flex-shrink:0}
 .club-app .club-auth .club-registration-form p {font-size:12px;margin:0}
 .club-birthday-input {position:relative}
-.club-app .club-auth .club-birthday-input input:not([type=hidden]) {padding-right:48px}
-.club-app .club-auth .club-birthday-input button {position:absolute;right:2px;top:5px;width:42px;height:44px;padding:0;border:0;display:grid;place-items:center;color:#806019}
 .club-birthday-calendar {margin-top:8px;padding:12px;border:1px solid #d4af67;border-radius:18px;background:#fffdf9;box-shadow:0 8px 24px #80601914}
 .club-birthday-controls {display:grid;grid-template-columns:1fr 100px;gap:8px}
 .club-app .club-auth .club-birthday-controls select {margin:0;font-size:14px}
@@ -1487,7 +1492,6 @@ footer .film-credit p,footer .sources-updates>p{font:13px/1.8 var(--sans);color:
 .club-app .club-auth .club-registration-form>.club-filter-select.is-open .club-filter-options {position:absolute;top:calc(100% + 6px);margin:0}
 .club-birthday {position:relative;min-width:0}
 .club-app .club-birthday-input {margin-top:5px}
-.club-app .club-auth .club-birthday-input button {top:0;height:44px}
 .club-birthday-calendar[popover] {position:fixed;inset:50% auto auto 50%;transform:translate(-50%,-50%);width:320px;max-width:calc(100vw - 28px);max-height:calc(100dvh - 32px);overflow:auto;box-sizing:border-box;margin:0;padding:14px;color:var(--ink);font:400 14px/1.4 var(--sans);border:1px solid #c9ad76;border-radius:18px;background:#fffdf9;box-shadow:0 16px 60px #30252a40}
 .club-birthday-calendar[popover]::backdrop {background:#30252a20}
 .club-birthday-calendar:not(:popover-open) {display:none}
@@ -1627,8 +1631,8 @@ footer .film-credit p,footer .sources-updates>p{font:13px/1.8 var(--sans);color:
 .club-app .club-friend-bubble .club-circle-unread {position:absolute;top:-7px;right:-10px;z-index:3;display:flex;align-items:center;justify-content:center;gap:3px;min-width:32px;height:27px;padding:0 6px;box-sizing:border-box;border:2px solid #fffdf9;border-radius:999px;background:#78233f;color:#fff;box-shadow:0 2px 6px #30252a26;pointer-events:none;font:600 11px/1 var(--sans)}
 .club-circle-unread svg {width:14px;height:14px;flex-shrink:0}
 
-.club-app .club-refined-card button.club-view-circle {position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-height:44px;margin:8px 0 0;padding:8px 0;border:0;border-top:1px solid #ded4c7;border-radius:0;background:transparent;box-shadow:none;color:var(--gold);font:500 13px/20px var(--sans);text-align:left}
-.club-app .club-refined-card button.club-view-circle:hover {text-decoration:underline;text-underline-offset:4px;background:transparent}
+.club-app .club-refined-card button.club-view-circle {position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:12px;box-sizing:border-box;width:100%;min-height:44px;margin:8px 0 0;padding:10px 18px;border:1px solid #c9ad76;border-radius:999px;background:#fffdf9;box-shadow:none;color:var(--gold);font:400 13px/1.5 var(--sans);text-align:left}
+.club-app .club-refined-card button.club-view-circle:hover {background:#faf7f1;border-color:#b89960}
 
 /* Compact conversation window; profile and other dialogs retain their sizing. */
 .club-app .club-message-dialog {width:440px;max-width:calc(100vw - 24px);max-height:calc(100dvh - 24px);border-radius:22px}
@@ -1646,7 +1650,7 @@ footer .film-credit p,footer .sources-updates>p{font:13px/1.8 var(--sans);color:
 .club-app .club-message-dialog .club-actions button {font:400 13px/20px var(--sans);min-height:44px;padding:8px 14px}
 
 /* A compact, centered friends-circle panel rather than a full-width section. */
-.club-app .club-inline-plan {width:100%;max-width:640px;box-sizing:border-box;margin:16px auto 0;padding:14px;border-radius:22px}
+.club-app .club-inline-plan {width:100%;max-width:none;box-sizing:border-box;margin:16px 0 0;padding:14px;border-radius:22px}
 .club-app .club-inline-plan-heading h3 {font-size:22px;line-height:1.25}
 .club-app .club-inline-plan .club-attending-circle {margin:4px 0 0;padding:8px 6px;border:0;border-radius:16px}
 .club-app .club-inline-plan .club-circle-heading {align-items:center}
@@ -1664,7 +1668,7 @@ footer .film-credit p,footer .sources-updates>p{font:13px/1.8 var(--sans);color:
 
 /* Audit: compact spacing with readable controls and a stable card footer. */
 .club-app .site-header.club-header.club-unified-header {padding:4px 18px;min-height:60px;gap:10px}
-.club-app .site-header.club-header.club-unified-header.is-scrolled {top:0;margin-top:0;border-radius:0 0 20px 20px}
+/* Scrolling must not change the header offset, margin or corner radius. */
 .club-app .club-header.club-unified-header :is(.club-brand,.club-demo-logo) {width:180px;height:48px}
 .club-app .club-header.club-unified-header :is(.club-brand img,img.club-demo-logo) {height:48px;object-fit:contain;object-position:center}
 .club-app .club-header.club-unified-header button.club-message-launcher {position:relative;display:grid;place-items:center;order:3;width:44px;height:44px;min-width:44px;min-height:44px;padding:10px;margin:0}
@@ -1677,7 +1681,7 @@ footer .film-credit p,footer .sources-updates>p{font:13px/1.8 var(--sans);color:
 .club-app .club-refined-card button.club-view-circle {margin-top:auto}
 .club-app .club-refined-card .club-anonymous-attendees {margin-bottom:8px}
 .club-app .club-refined-card.is-selected-plan {border-color:var(--gold);box-shadow:inset 0 0 0 1px var(--gold)}
-.club-app .club-inline-plan {max-width:560px;scroll-margin-top:80px;padding:12px}
+.club-app .club-inline-plan {scroll-margin-top:80px;padding:12px}
 .club-app .club-inline-plan-heading h3 {font-size:21px}
 .club-circle-performance-date {font:400 13px/1.5 var(--sans);color:#65585e;margin:2px 48px 8px 0}
 .club-app .club-inline-plan .club-circle-scene {height:270px;max-width:360px;--orbit-radius:84px}
@@ -1692,7 +1696,8 @@ footer .film-credit p,footer .sources-updates>p{font:13px/1.8 var(--sans);color:
 .club-app .club-circle-member-list button {display:flex;align-items:center;gap:8px;min-height:44px;padding:6px 10px;font-size:14px}
 .club-circle-member-list li>button:first-child {flex:1;min-width:0;text-align:left;border:0;background:transparent}
 .club-circle-member-list img {border-radius:50%;object-fit:cover}
-.club-circle-member-list .club-circle-interest {position:relative;inset:auto;flex-shrink:0}
+.club-circle-member-list .club-circle-interest {position:static;display:flex;flex-wrap:wrap;gap:3px;max-width:81px;flex-shrink:0;margin-left:auto}
+.club-circle-member-list .club-circle-interest-icon {position:static;transform:none}
 .club-app .club-inbox-list {max-width:520px;margin:16px auto;padding:20px;background:#fffdf9;border:1px solid #d4af67;border-radius:22px}
 .club-inbox-list h2 {font:400 26px/1.2 var(--display);margin:0 0 8px}
 .club-inbox-list ul {list-style:none;margin:16px 0;padding:0}
@@ -1731,3 +1736,89 @@ footer .film-credit p,footer .sources-updates>p{font:13px/1.8 var(--sans);color:
 .club-app .club-inbox-dialog .club-inbox-list h2 {padding-right:48px;min-height:44px;margin:0;font-size:25px}
 .club-app .club-inbox-dialog .club-inbox-list>p {font-size:14px;line-height:1.5;margin:8px 0}
 .club-app .club-inbox-dialog .club-inbox-list ul {margin:8px 0 0;max-height:50dvh;overflow:auto}
+
+/* Account pages share a bounded layout and a single mobile navigation level. */
+.club-app .club-profile-editor{max-width:1000px;margin:0 auto}
+.club-app .club-members-page{max-width:760px;margin:0 auto;min-height:55svh}
+.club-app .club-profile-editor>.club-calendar-welcome,.club-app .club-members-page>.club-calendar-welcome{padding:28px 0 20px}
+.club-app :is(.club-profile-editor,.club-members-page) .club-calendar-welcome h1{font-size:32px;margin:8px 0 10px}
+.club-app :is(.club-profile-editor,.club-members-page) .club-calendar-welcome p{max-width:60ch;font-size:14px;line-height:1.5}
+.club-app .club-member-management-grid.club-member-management-single{grid-template-columns:minmax(0,1fr)}
+.club-app .club-member-management-single .club-member-management-panel{width:100%;padding:24px}
+.club-app .club-member-management-single form{max-width:none;margin:0}
+.club-app .club-member-management-panel h2.sr-only{margin:0;padding:0}
+.club-app .club-invitee-list{margin:0;padding:0;list-style:none}
+.club-app .club-invitee-list>li{padding:18px 0;margin:0}
+.club-app .club-invitee-list>li:first-child{border-top:0;padding-top:0}
+.club-app .club-invitee-list>li:last-child{padding-bottom:0}
+.club-app .club-invitee-row{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.club-app .club-invitee-row>div{min-width:0}
+.club-app .club-invitee-row h3{font:500 15px/1.4 var(--sans);margin:0 0 5px;overflow-wrap:anywhere}
+.club-app .club-invitee-row p{margin:4px 0;font-size:13px;line-height:1.45}
+.club-app .club-member-options{flex-shrink:0;position:relative}
+.club-app .club-member-options summary{min-height:44px;display:flex;align-items:center;gap:8px;padding:8px 14px;font-size:13px;cursor:pointer;list-style:none}
+.club-app .club-member-options summary::-webkit-details-marker{display:none}
+.club-app .club-member-options>div{position:absolute;right:0;top:100%;z-index:5;min-width:190px;padding:8px;border:1px solid #d6b577;border-radius:22px;background:#fffdf9;box-shadow:0 8px 24px #30252a18}
+.club-app .club-member-options>div button{display:block;width:100%;border:0;border-radius:999px;text-align:left;font-size:13px}
+.club-app .club-member-options-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 0 6px 10px;color:var(--gold);font:500 12px/1.5 var(--sans)}
+.club-app .club-member-options>div button.club-member-options-close{display:grid;place-items:center;flex:0 0 44px;width:44px;height:44px;min-height:44px;padding:0;border:1px solid #d6b577;border-radius:50%;background:#fffdf9;color:var(--gold);font:400 22px/1 var(--sans);text-align:center}
+.club-app .club-invitation-status{color:#806019}
+.club-app .club-profile-panel{margin:0;padding:22px;min-width:0}
+.club-app .club-profile-grid{align-items:start;gap:18px}
+.club-app .club-profile-panel h2{font-size:24px;margin:0 0 12px}
+.club-app .club-profile-panel>p{font-size:13px;line-height:1.5}
+.club-app .club-profile-interests{margin-top:18px}
+.club-app .club-profile-save{position:sticky;bottom:12px;z-index:6;justify-content:space-between;gap:12px;margin:8px 0 0;padding:12px 16px;background:#fffdf9;border:1px solid #d6b577;border-radius:18px;box-shadow:0 6px 24px #30252a14}
+/* Reserve space for the focus outline between profile labels and controls. */
+:root body .club-app .club-profile-panel label> :is(input:not([type=checkbox]):not([type=hidden]),textarea){margin-top:8px}
+.club-app .club-profile-panel .club-birthday-input{margin-top:8px}
+.club-app .club-profile-panel .club-filter-select{gap:8px}
+.club-app .club-profile-panel .club-fine-print{margin-top:8px}
+.club-app .club-profile-save button:disabled{cursor:default}
+.club-app .club-profile-save{flex-wrap:wrap}
+.club-profile-save-actions{display:flex;flex-wrap:wrap;gap:8px}
+.club-profile-editor .club-profile-fields :is(input,textarea,button){scroll-margin-top:120px}
+.club-app .club-profile-editor.is-viewing .club-profile-fields button:disabled{cursor:default;opacity:1}
+:root body .club-app .club-profile-editor.is-viewing .club-profile-fields :is(input,textarea,.club-filter-trigger):disabled{color:var(--field-ink);background-color:#f7f3eb;opacity:1;cursor:default}
+/* Keep the calendar action centered within the shared date field. */
+.club-app .club-birthday-input{position:relative;display:grid}
+:root body .club-app .club-birthday .club-birthday-input>input:not([type=hidden]){display:block;margin:0;padding-right:56px}
+:root body .club-app .club-birthday-input>button{position:absolute;right:4px;top:50%;transform:translateY(-50%);display:grid;place-items:center;box-sizing:border-box;width:44px;height:44px;min-height:44px;margin:0;padding:0;border:0;border-radius:14px;background:transparent;box-shadow:none;color:var(--gold)}
+:root body .club-app .club-birthday-input>button:hover{background:#f1e7d2}
+:root body .club-app .club-birthday-input>button:focus-visible{outline:2px solid var(--field-focus);outline-offset:-4px}
+.club-app .club-birthday-input>button svg{display:block}
+.club-app .club-profile-editor .club-interest-choices{gap:8px}
+.club-app .club-profile-editor .club-interest-choices label{margin:0;min-height:44px;padding:8px 12px;font-size:13px}
+.club-app .club-profile-photo-placeholder{width:80px;height:80px;font-size:36px}
+.club-app .club-header .club-account-menu:has([aria-current=page])>summary{border-color:#806019;color:#806019;background:#f1e7d2}
+@media(max-width:700px){
+ .club-app .club-header .club-account-menu{width:100%;flex-basis:100%}
+ .club-app .club-header .club-account-menu>summary{display:none}
+ .club-app .club-header .club-account-menu-options{position:static;display:grid;min-width:0;gap:2px;margin:4px 0;padding:10px 0;border:0;border-top:1px solid #d8c7a9;border-bottom:1px solid #d8c7a9;border-radius:0;background:transparent;box-shadow:none}
+ .club-app .club-header .club-account-menu-options::before{content:'My Account';padding:0 12px 4px;color:#786d70;font:500 12px/1.5 var(--sans)}
+ .club-app .club-header .club-account-menu-options button{text-align:left;min-height:44px}
+ .club-app :is(.club-profile-editor,.club-members-page) .club-calendar-welcome h1{font-size:28px}
+ .club-app .club-profile-grid{grid-template-columns:1fr;gap:14px}
+ .club-app .club-profile-panel,.club-app .club-member-management-single .club-member-management-panel{padding:16px}
+ .club-app .club-profile-interests{margin-top:14px}
+ .club-app .club-invitee-row{align-items:flex-start;gap:10px}
+ .club-app .club-member-options summary{padding:8px 10px}
+ .club-app .club-profile-save{bottom:8px;padding:10px 12px}
+}
+
+.club-app .club-invitee-row{padding:0;border:0}
+.club-app .club-invitee-list>li+li{border-top:1px solid #d8c7a9}
+.club-app .club-member-management-grid{margin-top:0}
+.club-app .club-member-options summary{font-family:var(--sans)}
+
+/* Make the next step after attendance clear without opening the circle automatically. */
+.club-app .club-circle-next-step {margin:12px 0 8px;color:var(--gold);font:400 13px/1.5 var(--sans)}
+
+/* Keep the original integrated menu and stable header geometry while scrolling. */
+@media(max-width:1024px){
+ .club-app .site-header.club-header.club-unified-header,
+ .club-app .site-header.club-header.club-unified-header.is-scrolled {top:8px;margin:8px 10px 0;border-radius:22px}
+ .club-app .club-header.club-unified-header .club-mobile-menu-toggle {min-width:84px}
+}
+
+.club-app .club-conversation-dialog .club-chat-keyboard-hint{margin:0;color:#786d70;font:400 11px/1.4 var(--sans)}

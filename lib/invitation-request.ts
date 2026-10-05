@@ -13,7 +13,11 @@ export async function invitationRequest(request:Request,config:Config,makeClient
   const client=makeClient(config.supabaseUrl,config.supabaseKey,{global:{headers:{Authorization:authorization}},auth:{persistSession:false,autoRefreshToken:false}});
   // The caller's own JWT preserves the RPC's verified-member and recipient checks.
   const {data,error}=await client.rpc('club_command',{operation:'invite',payload:{email,secret_word:true}});
-  if(error)return Response.json({error:error.code==='P0001'?error.message:'Invitation could not be created.'},{status:400,headers});
+  if(error){
+   const message=error.code==='P0001'?error.message:'Invitation could not be created.';
+   const pending=message==='You already have a pending invitation for this email.';
+   return Response.json({error:pending?'This email already has a pending invitation. Open My invitees, then choose Options → Resend invitation to email a new secret word.':message},{status:pending?409:400,headers});
+  }
   if(!data||typeof data.token!=='string'||!isInvitationCode(data.token))throw Error();
   let delivery:'queued'|'unavailable'|'failed'='failed';
   try{delivery=await send(email,data.token,config);}catch{/* Preserve the created code for manual recovery. */}
