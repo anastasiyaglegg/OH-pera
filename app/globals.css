@@ -899,6 +899,8 @@ footer .film-credit p,footer .sources-updates>p{font:13px/1.8 var(--sans);color:
 .club-opera-carousel .club-evenings{display:grid;grid-auto-flow:column;grid-auto-columns:clamp(340px,38vw,560px);grid-template-rows:auto auto auto auto;gap:12px 24px;align-items:stretch}
 .club-opera-carousel .club-opera-slide{display:grid;grid-row:1 / span 4;grid-template-rows:subgrid;min-width:0}
 .club-opera-carousel .club-opera-slide .club-refined-card{display:grid;grid-row:1 / span 4;grid-template-rows:subgrid;grid-template-columns:minmax(0,1fr);align-items:start}
+/* Keep every section in the card column; legacy tablet actions use column 2. */
+.club-opera-carousel .club-refined-card>div,.club-opera-carousel .club-refined-card>.club-attendance{grid-column:1;min-width:0}
 .club-opera-carousel .club-card-heading{grid-row:1}
 .club-opera-carousel .club-evening-action{grid-row:2}
 .club-opera-carousel .club-evening-art{grid-row:3}
