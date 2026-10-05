@@ -38,3 +38,11 @@ test('secret word email contains no links, recipient addresses, or long legacy c
   return Response.json({id:'word-email'});
  }),'queued');
 });
+
+test('a pending invitation gives resend instructions without sending another email',async()=>{
+ const response=await invitationRequest(req(),config,fakeClient({code:'P0001',message:'You already have a pending invitation for this email.'}),()=>{throw Error('must not send');});
+ assert.equal(response.status,409);
+ const result=await response.json();
+ assert.match(result.error,/My invitees/);
+ assert.match(result.error,/Resend invitation/);
+});
