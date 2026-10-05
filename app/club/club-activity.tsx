@@ -45,6 +45,7 @@ function OperaDetails({performance:p,onClose}:{performance:EventRow['performance
 }
 
 function Attendees({row,onProfile,onToggleCircle,circleOpen}:{row:EventRow;onProfile:(person:Person)=>void;onToggleCircle:()=>void;circleOpen:boolean}){
+ const [circleSeen,setCircleSeen]=useState(circleOpen);
  const self=row.mine==='going'&&row.total>0;
  const others=Math.max(0,row.total-row.people.length-(self?1:0));
  return <section className="club-attendance" aria-label="Who is going">
@@ -57,7 +58,7 @@ function Attendees({row,onProfile,onToggleCircle,circleOpen}:{row:EventRow;onPro
    {others>0&&<div className="club-anonymous-attendees"><span className="club-anonymous-avatar" aria-hidden="true">+{others}</span><span>{others} other {others===1?'member':'members'} going</span></div>}
   </>}
   {self&&!circleOpen&&<p className="club-circle-next-step">Next: open your friends’ circle to plan your evening.</p>}
-  <button type="button" className={`club-view-circle${self?' is-going':''}`} aria-expanded={circleOpen} aria-controls={circleOpen?`inline-plan-${row.performance.id}`:undefined} onClick={onToggleCircle}>{circleOpen?'Close friends’ circle':'Open friends’ circle'} <span aria-hidden="true">{circleOpen?'↑':'↓'}</span></button>
+  <button type="button" className={`club-view-circle${self?' is-going':''}${self&&!circleOpen&&!circleSeen?' needs-circle-prompt':''}`} aria-expanded={circleOpen} aria-controls={circleOpen?`inline-plan-${row.performance.id}`:undefined} onClick={()=>{setCircleSeen(true);onToggleCircle();}}>{circleOpen?'Close friends’ circle':'Open friends’ circle'} <span aria-hidden="true">{circleOpen?'↑':'↓'}</span></button>
  </section>;
 }
 
